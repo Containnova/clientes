@@ -150,6 +150,29 @@ table.table .form-control.error {
 </script>
 		
 <script type="text/javascript">
+	$("#datepicker").datepicker({
+  dateFormat: "dd/mm/yy",
+  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+  monthNames: [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+  ],
+  showButtonPanel: true,
+  currentText: "Hoy",
+  closeText: "Cerrar",
+  showWeek: true,
+  firstDay: 1
+});
 Office.initialize = function() {
 $("#guardar").click(() => tryCatch(guardar));
 $("#limpiar").click(() => tryCatch(limpiar));
@@ -423,29 +446,6 @@ function myFunction(myInput, myTable) {
       }
     }
   };
-$("#datepicker").datepicker({
-  dateFormat: "dd/mm/yy",
-  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-  monthNames: [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
-  ],
-  showButtonPanel: true,
-  currentText: "Hoy",
-  closeText: "Cerrar",
-  showWeek: true,
-  firstDay: 1
-});
 };
 </script>
 
