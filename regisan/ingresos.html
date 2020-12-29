@@ -192,10 +192,7 @@ Excel.run(async (context) => {
   cargarlista(subServ, "subServ");
   cargarlista(productos, "productos");
 
-
-});
-
-$("table.tableList tbody tr").click(function() {
+	$("table.tableList tbody tr").click(function() {
     var tablaId = $(this)
       .parent()
       .parent("table")
@@ -212,6 +209,10 @@ $("table.tableList tbody tr").click(function() {
     $("#" + inputId).val(item);
     $("#" + tablaId).hide();
   });
+
+});
+
+
 	
 	
 	
@@ -223,24 +224,6 @@ function cargarlista(data, id) {
   $("#" + id).after(item);
 }
 
-function myFunction(myInput, myTable) {
-  var input, filter, table, tr, td, i, txtValue;
-  filter = $("#" + myInput)
-    .val()
-    .toUpperCase();
-  tr = $("#" + myTable).find("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
 
 $("input").click(function() {
   var tableId = $(this)
@@ -444,6 +427,26 @@ function tryCatch(callback) {
       console.error(error);
     });
 }
+		
+};
+
+function myFunction(myInput, myTable) {
+  var input, filter, table, tr, td, i, txtValue;
+  filter = $("#" + myInput)
+    .val()
+    .toUpperCase();
+  tr = $("#" + myTable).find("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
 };
 </script>
 
