@@ -154,30 +154,6 @@ Office.initialize = function() {
 $("#guardar").click(() => tryCatch(guardar));
 $("#limpiar").click(() => tryCatch(limpiar));
 
-$("#datepicker").datepicker({
-  dateFormat: "dd/mm/yy",
-  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-  monthNames: [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
-  ],
-  showButtonPanel: true,
-  currentText: "Hoy",
-  closeText: "Cerrar",
-  showWeek: true,
-  firstDay: 1
-});
-
 Excel.run(async (context) => {
   var hoja = context.workbook.worksheets.getItem("TBL");
   var clientes = hoja.getRange("list_clientes").load();
@@ -446,7 +422,30 @@ function myFunction(myInput, myTable) {
         tr[i].style.display = "none";
       }
     }
-  }
+  };
+$("#datepicker").datepicker({
+  dateFormat: "dd/mm/yy",
+  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+  monthNames: [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+  ],
+  showButtonPanel: true,
+  currentText: "Hoy",
+  closeText: "Cerrar",
+  showWeek: true,
+  firstDay: 1
+});
 };
 </script>
 
