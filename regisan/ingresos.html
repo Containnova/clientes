@@ -13,9 +13,6 @@
 	<!-- ScriptLab -->
     <script src="https://bornholm-insiders.azurewebsites.net/libs/auth-helpers.js?hash=041ca614ce7a4eacfb2d"></script>
     <script src="https://bornholm-insiders.azurewebsites.net/libs/maker.js?hash=041ca614ce7a4eacfb2d"></script>
-	<!-- office -->
-    <script crossorigin="anonymous" src="https://unpkg.com/core-js@2.4.1/client/core.min.js"></script>
-    <script crossorigin="anonymous" src="https://unpkg.com/jquery@3.1.1"></script>
 	<!-- otros -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
    
@@ -23,6 +20,9 @@
 	
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
 	
+     <!-- office -->
+    <script crossorigin="anonymous" src="https://unpkg.com/core-js@2.4.1/client/core.min.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/jquery@3.1.1"></script>
 
 
     <!--CSS -->
@@ -280,7 +280,10 @@ table.table .form-control.error {
 						</div>
 					</div>
 
-		
+<script>
+        window.ScriptLab = window.ScriptLab || {};
+        window.ScriptLab._strings = {"unexpectedError":"Ocurrió un error inesperado","authenticationWasCancelledByTheUser":"Authentication was cancelled by the user","officeVersionDoesNotSupportAuthentication":"Your current version of Office does not support displaying an authentication dialog. Please update to a newer version, or try Office Online, if you would like to run this snippet."};
+    </script>
 		
 <script type="text/javascript">
 Office.initialize = function() {
