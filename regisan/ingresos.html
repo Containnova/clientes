@@ -189,6 +189,29 @@ Excel.run(async (context) => {
 
 });
 
+$("#datepicker").datepicker({
+  dateFormat: "dd/mm/yy",
+  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+  monthNames: [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+  ],
+  showButtonPanel: true,
+  currentText: "Hoy",
+  closeText: "Cerrar",
+  showWeek: true,
+  firstDay: 1
+});
 
 	
 	
@@ -424,29 +447,6 @@ function myFunction(myInput, myTable) {
       }
     }
   };
-$("#datepicker").datepicker({
-  dateFormat: "dd/mm/yy",
-  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-  monthNames: [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
-  ],
-  showButtonPanel: true,
-  currentText: "Hoy",
-  closeText: "Cerrar",
-  showWeek: true,
-  firstDay: 1
-});
 };
 </script>
 
