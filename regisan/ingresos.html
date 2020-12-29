@@ -6,13 +6,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <title> - containnova - </title>
+    <title>containnova</title>
 
 	<!--JAVASCRIPT-->
 	<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
-	
-    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
-	
+	<!-- ScriptLab -->
+    <script src="https://bornholm-insiders.azurewebsites.net/libs/auth-helpers.js?hash=041ca614ce7a4eacfb2d"></script>
+    <script src="https://bornholm-insiders.azurewebsites.net/libs/maker.js?hash=041ca614ce7a4eacfb2d"></script>
+	<!-- office -->
+    <script crossorigin="anonymous" src="https://unpkg.com/core-js@2.4.1/client/core.min.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/jquery@3.1.1"></script>
+	<!-- otros -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
    
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
@@ -141,10 +145,10 @@ table.table .form-control.error {
 }
 	</style>
 
-
+</head>
 
 <script type="text/javascript">
-
+Office.initialize = function() {
 $("#guardar").click(() => tryCatch(guardar));
 $("#limpiar").click(() => tryCatch(limpiar));
 
@@ -312,7 +316,7 @@ $(document).on("click", ".add", function() {
     //$(".add-new").removeAttr("disabled");
   }
 });
-</head>
+
 
 $(document).on("click", ".delete", function() {
   var precio, cantidad, subTotal, iva, tasaIva, total;
@@ -434,6 +438,7 @@ function tryCatch(callback) {
       console.error(error);
     });
 }
+};
 </script>
 
 
