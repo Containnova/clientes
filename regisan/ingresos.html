@@ -192,7 +192,10 @@ Excel.run(async (context) => {
   cargarlista(subServ, "subServ");
   cargarlista(productos, "productos");
 
-  $("table.tableList tbody tr").click(function() {
+
+});
+
+$("table.tableList tbody tr").click(function() {
     var tablaId = $(this)
       .parent()
       .parent("table")
@@ -209,8 +212,9 @@ Excel.run(async (context) => {
     $("#" + inputId).val(item);
     $("#" + tablaId).hide();
   });
-});
-
+	
+	
+	
 function cargarlista(data, id) {
   var item = "";
   for (var i = 0; i < data.values.length; i++) {
