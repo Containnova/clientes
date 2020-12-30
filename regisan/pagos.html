@@ -223,41 +223,7 @@ function cargarlista(data, id) {
   $("#" + id).after(item);
 }
 
-function myFunction(myInput, myTable) {
-  var filterLista, tr, td, i, txtValue, trTabla, tdTabla, j, txtValueTabla;
-  //Lista
-  filterLista = $("#" + myInput)
-    .val()
-    .toUpperCase();
-  tr = $("#" + myTable).find("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
 
-      if (txtValue.toUpperCase().indexOf(filterLista) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-  //Tabla
-  trTabla = $("#newTable").find("tr");
-
-  for (j = 0; j < trTabla.length; j++) {
-    tdTabla = trTabla[j].getElementsByTagName("td")[1];
-    if (tdTabla) {
-      txtValueTabla = tdTabla.textContent || tdTabla.innerText;
-
-      if (txtValueTabla.toUpperCase().indexOf(filterLista) > -1) {
-        trTabla[j].style.display = "";
-      } else {
-        trTabla[j].style.display = "none";
-      }
-    }
-  }
-}
 
 $("input").click(function() {
   var tableId = $(this)
@@ -436,8 +402,42 @@ function tryCatch(callback) {
       console.error(error);
     });
 }
+};
+	
+function myFunction(myInput, myTable) {
+  var filterLista, tr, td, i, txtValue, trTabla, tdTabla, j, txtValueTabla;
+  //Lista
+  filterLista = $("#" + myInput)
+    .val()
+    .toUpperCase();
+  tr = $("#" + myTable).find("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
 
+      if (txtValue.toUpperCase().indexOf(filterLista) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+  //Tabla
+  trTabla = $("#newTable").find("tr");
 
+  for (j = 0; j < trTabla.length; j++) {
+    tdTabla = trTabla[j].getElementsByTagName("td")[1];
+    if (tdTabla) {
+      txtValueTabla = tdTabla.textContent || tdTabla.innerText;
+
+      if (txtValueTabla.toUpperCase().indexOf(filterLista) > -1) {
+        trTabla[j].style.display = "";
+      } else {
+        trTabla[j].style.display = "none";
+      }
+    }
+  }
 };
 </script>
 
