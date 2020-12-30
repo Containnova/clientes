@@ -146,9 +146,8 @@ table.table .form-control.error {
 </script>
 		
 <script type="text/javascript">
-	
-Office.initialize = function() {
 
+Office.onReady(function (info) {
 $("#guardar").click(() => tryCatch(guardar));
 $("#limpiar").click(() => tryCatch(limpiar));
 
@@ -175,7 +174,7 @@ $("#datepicker").datepicker({
   showWeek: true,
   firstDay: 1
 });
-
+  var rango = "";
 Excel.run(async (context) => {
   var hojaTBL = context.workbook.worksheets.getItem("TBL");
   var hojaBDD = context.workbook.worksheets.getItem("BDD");
@@ -190,11 +189,11 @@ Excel.run(async (context) => {
 
   await context.sync(); //resultados
 
-  var rango = "E4:G" + ultFila.rowCount;
+  rango = "E4:G" + ultFila.rowCount;
 
   cargarlista(proveedores, "proveedores");
   cargarlista(clientes, "clientes");
-  estado(hojaEstados, rango);
+  estado();
 
   $("table.tableList tbody tr").click(function() {
     var tablaId = $(this)
@@ -224,7 +223,6 @@ function cargarlista(data, id) {
 }
 
 
-
 $("input").click(function() {
   var tableId = $(this)
     .parent("div")
@@ -233,26 +231,6 @@ $("input").click(function() {
   $("#" + tableId).show();
 });
 
-function checkbox(id) {
-  var check = $("input[data-check='" + id + "']").prop("checked");
-  var monto = $("td[id='" + id + "']").text();
-
-  if (check) {
-    $("input[id='" + id + "']").val(monto);
-  } else {
-    $("input[id='" + id + "']").val("");
-  }
-  sumar();
-}
-
-function sumar() {
-  var sum = 0;
-  $(".tbl-pago").each(function() {
-    sum += Number($(this).val());
-  });
-  $(".totalPagos").text(sum);
-  sumaTotal();
-}
 
 async function guardar() {
   await Excel.run(async (context) => {
@@ -262,7 +240,7 @@ async function guardar() {
     var cuenta = "Pago";
     var cliente = $("#inputClientes").val();
     var proveedor = $("#inputProveedores").val();
-    var fecha = $("#datepicker").datepicker({ dateFormat: 'mm-dd-yy' }).val();
+    var fecha = $("#datepicker").val();
     var servicio_descripcion = $("#inputPago").val(); //forma de pago
     var nro_dep_pag = $("#inputNroDep").val();
     var anticipo = $("#inputAnticipo").val();
@@ -343,9 +321,10 @@ async function guardar() {
   });
 }
 
-async function estado(datos, rangos) {
+async function estado() {
   await Excel.run(async (context) => {
-    var data = datos.getRange(rangos).load("values");
+    var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
+    var data = hojaEstados.getRange(rango).load("values");
     await context.sync();
     //console.log(data.values);
     var item = "";
@@ -370,13 +349,7 @@ $(document).on("focusout", "#inputAnticipo", function() {
   sumaTotal();
 });
 
-function sumaTotal() {
-  var anticipo = Number($("#inputAnticipo").val());
-  var totalAnticipo = $(".totalAnticipos").text(anticipo);
-  var totalPagos = $(".totalPagos").text();
-  var totalIngresos = anticipo + Number(totalPagos);
-  $(".totalEgresos").text(totalIngresos);
-}
+
 
 async function limpiar() {
   await Excel.run(async (context) => {
@@ -402,8 +375,7 @@ function tryCatch(callback) {
       console.error(error);
     });
 }
-};
-	
+});
 function myFunction(myInput, myTable) {
   var filterLista, tr, td, i, txtValue, trTabla, tdTabla, j, txtValueTabla;
   //Lista
@@ -439,6 +411,34 @@ function myFunction(myInput, myTable) {
     }
   }
 };
+function checkbox(id) {
+  var check = $("input[data-check='" + id + "']").prop("checked");
+  var monto = $("td[id='" + id + "']").text();
+
+  if (check) {
+    $("input[id='" + id + "']").val(monto);
+  } else {
+    $("input[id='" + id + "']").val("");
+  }
+  sumar();
+};
+
+function sumar() {
+  var sum = 0;
+  $(".tbl-pago").each(function () {
+    sum += Number($(this).val());
+  });
+  $(".totalPagos").text(sum);
+  sumaTotal();
+};
+function sumaTotal() {
+  var anticipo = Number($("#inputAnticipo").val());
+  var totalAnticipo = $(".totalAnticipos").text(anticipo);
+  var totalPagos = $(".totalPagos").text();
+  var totalIngresos = anticipo + Number(totalPagos);
+  $(".totalEgresos").text(totalIngresos);
+};
+
 </script>
 
 
