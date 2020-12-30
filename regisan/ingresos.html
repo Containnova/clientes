@@ -381,7 +381,7 @@ async function guardar() {
           cuenta,
           cliente,
           proveedor,
-          "=DATE(" + date.getFullYear() + "," + date.getMonth() + "," + date.getDate() + ")",
+          "=DATE(YEAR(" + fecha + "), MONTH(" + fecha + "), DAY(" + fecha + "))",
           nro_fact,
           servicio_descripcion,
           producto,
