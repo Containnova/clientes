@@ -351,6 +351,8 @@ async function guardar() {
     var producto = $("#inputProductos").val();
     var subServ, cantidad, precio_u, tasa, datos, query;
 
+	var date = new Date(fecha);
+	  
     //var index = $("#newTable tbody tr:last-child").index(); ${}
     datos = $("#newTable").find("tr:has(td)");
     query = [];
@@ -379,7 +381,7 @@ async function guardar() {
           cuenta,
           cliente,
           proveedor,
-          fecha,
+          "=DATE(" + date.getFullYear() + "," + date.getMonth() + "," + date.getDate() + ")",
           nro_fact,
           servicio_descripcion,
           producto,
