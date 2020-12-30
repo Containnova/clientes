@@ -340,25 +340,6 @@ async function guardar() {
   });
 }
 
-async function estado(datos, rangos) {
-  await Excel.run(async (context) => {
-    var data = datos.getRange(rangos).load("values");
-    await context.sync();
-    //console.log(data.values);
-    var item = "";
-    for (var i = 0; i < data.values.length; i++) {
-      item += `<tr>
-        <td><input type="checkbox" onclick="checkbox(${i})" class="form-check-input" data-check="${i}"></td>
-        <td class="tbl-cliente">${data.values[i][0]}</td>
-        <td class="tbl-factura">${data.values[i][1]}</td>
-        <td id="${i}">${data.values[i][2]}</td>
-        <td><input type="text" id="${i}" class="form-control tbl-cobro"></td>
-      </tr>`;
-    }
-    $("#newTable tbody").after(item);
-  });
-}
-
 $(document).on("focusout", ".tbl-cobro", function() {
   sumar();
 });
@@ -438,6 +419,26 @@ function myFunction(myInput, myTable) {
     }
   }
 };
+	
+async function estado(datos, rangos) {
+  await Excel.run(async (context) => {
+    var data = datos.getRange(rangos).load("values");
+    await context.sync();
+    //console.log(data.values);
+    var item = "";
+    for (var i = 0; i < data.values.length; i++) {
+      item += `<tr>
+        <td><input type="checkbox" onclick="checkbox(${i})" class="form-check-input" data-check="${i}"></td>
+        <td class="tbl-cliente">${data.values[i][0]}</td>
+        <td class="tbl-factura">${data.values[i][1]}</td>
+        <td id="${i}">${data.values[i][2]}</td>
+        <td><input type="text" id="${i}" class="form-control tbl-cobro"></td>
+      </tr>`;
+    }
+    $("#newTable tbody").after(item);
+  });
+}
+	
 </script>
 
 
@@ -467,7 +468,7 @@ function myFunction(myInput, myTable) {
 						<input type="text" id="inputNroDep" class="inputFormat" placeholder="No. Dp/Ch/Tr">
         </div>
 						<div class="col">
-							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipo $">
+							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipos $">
         </div>
 						</div>
 
