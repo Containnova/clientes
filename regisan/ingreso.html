@@ -351,13 +351,14 @@ async function guardar() {
     var producto = $("#inputProductos").val();
     var subServ, cantidad, precio_u, tasa, datos, query;
 
-	var date = new Date(fecha);
+	
 	  
     //var index = $("#newTable tbody tr:last-child").index(); ${}
     datos = $("#newTable").find("tr:has(td)");
     query = [];
     //console.log(datos.length - 1);
-
+	var date = new Date(fecha);
+	  
     for (var i = 0; i < datos.length; i++) {
       subServ = datos
         .eq(i)
@@ -381,7 +382,7 @@ async function guardar() {
           cuenta,
           cliente,
           proveedor,
-          "=DATE(" + date.getFullYear() + "," + date.getMonth() + "," + date.getDate() + ")",
+          "=DATE(" + date.getFullYear() + "," + date.getDate() + "," + date.getMonth() + ")",
           nro_fact,
           servicio_descripcion,
           producto,
