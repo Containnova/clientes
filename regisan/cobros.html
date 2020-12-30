@@ -258,7 +258,7 @@ Office.onReady(function (info) {
           cuenta,
           cliente,
           proveedor,
-          fecha,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
           "ANTICIPOS",
           "Anticipo:" + servicio_descripcion,
           "",
@@ -299,7 +299,7 @@ Office.onReady(function (info) {
           cuenta,
           tbl_cliente,
           proveedor,
-          fecha,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
           tbl_nro_fact,
           servicio_descripcion,
           "",
@@ -471,7 +471,7 @@ function sumaTotal() {
             </select>
 					</div>
 					<div class="col">
-						<input type="text" id="inputNroDep" class="inputFormat" placeholder="Nro. Dp/Ch/Tr">
+						<input type="text" id="inputNroDep" class="inputFormat" placeholder="No. Dp/Ch/Tr">
         </div>
 						<div class="col">
 							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipo $">
