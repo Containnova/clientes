@@ -147,301 +147,301 @@ table.table .form-control.error {
 		
 <script type="text/javascript">
 	
-Office.initialize = function() {
+Office.initialize = function (info) { };
+  $("#guardar").click(() => tryCatch(guardar));
+  $("#limpiar").click(() => tryCatch(limpiar));
 
-$("#guardar").click(() => tryCatch(guardar));
-$("#limpiar").click(() => tryCatch(limpiar));
-
-$("#datepicker").datepicker({
-  dateFormat: "dd/mm/yy",
-  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-  monthNames: [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
-  ],
-  showButtonPanel: true,
-  currentText: "Hoy",
-  closeText: "Cerrar",
-  showWeek: true,
-  firstDay: 1
-});
-
-var rango = "";
-
-Excel.run(async (context) => {
-  var hojaTBL = context.workbook.worksheets.getItem("TBL");
-  var hojaBDD = context.workbook.worksheets.getItem("BDD");
-  var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
-  var clientes = hojaTBL.getRange("list_clientes").load();
-  //var tablaBDD = hojaBDD.tables.getItem("BDD");
-  //var tablaBDD_datos = tablaBDD.getDataBodyRange().load("values");
-  var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxc");
-  tablaDinamica.refresh();
-  var ultFila = tablaDinamica.layout.getDataBodyRange().load("rowCount");
-
-  await context.sync(); //resultados
-
-  rango = "A4:C" + ultFila.rowCount;
-
-  cargarlista(clientes, "clientes");
-  estado(hojaEstados);
-
-  $("table.tableList tbody tr").click(function() {
-    var tablaId = $(this)
-      .parent()
-      .parent("table")
-      .attr("id");
-    var inputId = $(this)
-      .parent()
-      .parent()
-      .parent()
-      .children("input")
-      .attr("id");
-    var item = $(this)
-      .find("td:last-child")
-      .text();
-    $("#" + inputId).val(item);
-    $("#" + tablaId).hide();
+  $("#datepicker").datepicker({
+    dateFormat: "dd/mm/yy",
+    dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+    monthNames: [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    showButtonPanel: true,
+    currentText: "Hoy",
+    closeText: "Cerrar",
+    showWeek: true,
+    firstDay: 1
   });
-});
 
-function cargarlista(data, id) {
-  var item = "";
-  for (var i = 0; i < data.values.length; i++) {
-    item += `<tr><td>${data.values[i][0]}</td></tr>`;
-  }
-  $("#" + id).after(item);
-}
+  var rango = "";
 
+  Excel.run(async (context) => {
+    var hojaTBL = context.workbook.worksheets.getItem("TBL");
+    var hojaBDD = context.workbook.worksheets.getItem("BDD");
+    var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
+    var clientes = hojaTBL.getRange("list_clientes").load();
+    //var tablaBDD = hojaBDD.tables.getItem("BDD");
+    //var tablaBDD_datos = tablaBDD.getDataBodyRange().load("values");
+    var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxc");
+    tablaDinamica.refresh();
+    var ultFila = tablaDinamica.layout.getDataBodyRange().load("rowCount");
 
-	
-$("input").click(function() {
-  var tableId = $(this)
-    .parent("div")
-    .children("table")
-    .attr("id");
-  $("#" + tableId).show();
-});
+    await context.sync(); //resultados
 
-function checkbox(id) {
-  var check = $("input[data-check='" + id + "']").prop("checked");
-  var monto = $("td[id='" + id + "']").text();
+    rango = "A4:C" + ultFila.rowCount;
 
-  if (check) {
-    $("input[id='" + id + "']").val(monto);
-  } else {
-    $("input[id='" + id + "']").val("");
-  }
-  sumar();
-}
+    cargarlista(clientes, "clientes");
+    //console.log(hojaEstados);
+    estado(hojaEstados);
 
-function sumar() {
-  var sum = 0;
-  $(".tbl-cobro").each(function() {
-    sum += Number($(this).val());
-  });
-  $(".totalCobros").text(sum);
-  sumaTotal();
-}
-
-async function guardar() {
-  await Excel.run(async (context) => {
-    var hoja = context.workbook.worksheets.getItem("BDD");
-    var expensesTable = hoja.tables.getItem("BDD");
-    //OfficeExtension.config.extendedErrorLogging = true;
-    var cuenta = "Cobro";
-    var cliente = $("#inputClientes").val();
-    var proveedor = "";
-    var fecha = $("#datepicker").val();
-    var servicio_descripcion = $("#inputPago").val(); //forma de pago
-    var nro_dep_pag = $("#inputNroDep").val();
-    var anticipo = $("#inputAnticipo").val();
-    var tbl_cliente, tbl_nro_fact, tbl_cobro, datos, query;
-
-    query = [];
-
-    if (anticipo != 0) {
-      query.push([
-        cuenta,
-        cliente,
-        proveedor,
-        fecha,
-        "ANTICIPOS",
-        "Anticipo:" + servicio_descripcion,
-        "",
-        "",
-        0,
-        0,
-        0,
-        0,
-        0,
-        anticipo * -1,
-        "=YEAR([@fecha])",
-        '=UPPER(TEXT([@fecha],"mmmm"))',
-        '=IF([@proveedor]<>"","Proveedor","Cliente")',
-        '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
-        "=ROW()-1",
-        nro_dep_pag
-      ]);
-    }
-
-    $("#newTable input:checked").each(function() {
-      tbl_cliente = $(this)
-        .parents("tr")
-        .children("td.tbl-cliente")
+    $("table.tableList tbody tr").click(function() {
+      var tablaId = $(this)
+        .parent()
+        .parent("table")
+        .attr("id");
+      var inputId = $(this)
+        .parent()
+        .parent()
+        .parent()
+        .children("input")
+        .attr("id");
+      var item = $(this)
+        .find("td:last-child")
         .text();
-
-      tbl_nro_fact = $(this)
-        .parents("tr")
-        .children("td.tbl-factura")
-        .text();
-
-      tbl_cobro = $(this)
-        .parents("tr")
-        .children("td")
-        .find("input.tbl-cobro")
-        .val();
-
-      query.push([
-        cuenta,
-        tbl_cliente,
-        proveedor,
-        fecha,
-        tbl_nro_fact,
-        servicio_descripcion,
-        "",
-        "",
-        0,
-        0,
-        0,
-        0,
-        0,
-        tbl_cobro * -1,
-        "=YEAR([@fecha])",
-        '=UPPER(TEXT([@fecha],"mmmm"))',
-        '=IF([@proveedor]<>"","Proveedor","Cliente")',
-        '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
-        "=ROW()-1",
-        nro_dep_pag
-      ]);
+      $("#" + inputId).val(item);
+      $("#" + tablaId).hide();
     });
-    //console.log(query);
-
-    expensesTable.rows.add(null, query);
-    limpiar();
-    await context.sync();
   });
-}
 
-async function estado(datos) {
-  await Excel.run(async (context) => {
-    //console.log(rango);
-    var data = datos.getRange(rango).load("values");
-    await context.sync();
-    //console.log(data.values);
+  function cargarlista(data, id) {
     var item = "";
     for (var i = 0; i < data.values.length; i++) {
-      item += `<tr>
+      item += `<tr><td>${data.values[i][0]}</td></tr>`;
+    }
+    $("#" + id).after(item);
+  }
+
+  function myFunction(myInput, myTable) {
+    console.log("aqui");
+    var filterLista, tr, td, i, txtValue, trTabla, tdTabla, j, txtValueTabla;
+    //Lista
+    filterLista = $("#" + myInput)
+      .val()
+      .toUpperCase();
+    tr = $("#" + myTable).find("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+
+        if (txtValue.toUpperCase().indexOf(filterLista) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+    //Tabla
+    trTabla = $("#newTable").find("tr");
+
+    for (j = 0; j < trTabla.length; j++) {
+      tdTabla = trTabla[j].getElementsByTagName("td")[1];
+      if (tdTabla) {
+        txtValueTabla = tdTabla.textContent || tdTabla.innerText;
+
+        if (txtValueTabla.toUpperCase().indexOf(filterLista) > -1) {
+          trTabla[j].style.display = "";
+        } else {
+          trTabla[j].style.display = "none";
+        }
+      }
+    }
+  }
+
+
+  $("input").click(function() {
+    var tableId = $(this)
+      .parent("div")
+      .children("table")
+      .attr("id");
+    $("#" + tableId).show();
+  });
+
+  function checkbox(id) {
+    var check = $("input[data-check='" + id + "']").prop("checked");
+    var monto = $("td[id='" + id + "']").text();
+
+    if (check) {
+      $("input[id='" + id + "']").val(monto);
+    } else {
+      $("input[id='" + id + "']").val("");
+    }
+    sumar();
+  }
+
+  function sumar() {
+    var sum = 0;
+    $(".tbl-cobro").each(function() {
+      sum += Number($(this).val());
+    });
+    $(".totalCobros").text(sum);
+    sumaTotal();
+  }
+
+  async function guardar() {
+    await Excel.run(async (context) => {
+      var hoja = context.workbook.worksheets.getItem("BDD");
+      var expensesTable = hoja.tables.getItem("BDD");
+      //OfficeExtension.config.extendedErrorLogging = true;
+      var cuenta = "Cobro";
+      var cliente = $("#inputClientes").val();
+      var proveedor = "";
+      var fecha = $("#datepicker").val();
+      var servicio_descripcion = $("#inputPago").val(); //forma de pago
+      var nro_dep_pag = $("#inputNroDep").val();
+      var anticipo = $("#inputAnticipo").val();
+      var tbl_cliente, tbl_nro_fact, tbl_cobro, datos, query;
+
+      query = [];
+
+      if (anticipo != 0) {
+        query.push([
+          cuenta,
+          cliente,
+          proveedor,
+          fecha,
+          "ANTICIPOS",
+          "Anticipo:" + servicio_descripcion,
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          anticipo * -1,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          nro_dep_pag
+        ]);
+      }
+
+      $("#newTable input:checked").each(function() {
+        tbl_cliente = $(this)
+          .parents("tr")
+          .children("td.tbl-cliente")
+          .text();
+
+        tbl_nro_fact = $(this)
+          .parents("tr")
+          .children("td.tbl-factura")
+          .text();
+
+        tbl_cobro = $(this)
+          .parents("tr")
+          .children("td")
+          .find("input.tbl-cobro")
+          .val();
+
+        query.push([
+          cuenta,
+          tbl_cliente,
+          proveedor,
+          fecha,
+          tbl_nro_fact,
+          servicio_descripcion,
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          tbl_cobro * -1,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          nro_dep_pag
+        ]);
+      });
+      //console.log(query);
+
+      expensesTable.rows.add(null, query);
+      limpiar();
+      await context.sync();
+    });
+  }
+
+  function estado(datos) {
+    Excel.run(async (context) => {
+      //console.log(rango);
+      //console.log(datos);
+      var data = datos.getRange(rango).load("values");
+      await context.sync();
+      //console.log(data.values);
+      var item = "";
+      for (var i = 0; i < data.values.length; i++) {
+        item += `<tr>
         <td><input type="checkbox" onclick="checkbox(${i})" class="form-check-input" data-check="${i}"></td>
         <td class="tbl-cliente">${data.values[i][0]}</td>
         <td class="tbl-factura">${data.values[i][1]}</td>
         <td id="${i}">${data.values[i][2]}</td>
         <td><input type="text" id="${i}" class="form-control tbl-cobro"></td>
       </tr>`;
-    }
-    $("#newTable tbody").after(item);
-  });
-}
-
-$(document).on("focusout", ".tbl-cobro", function() {
-  sumar();
-});
-
-$(document).on("focusout", "#inputAnticipo", function() {
-  sumaTotal();
-});
-
-function sumaTotal() {
-  var anticipo = Number($("#inputAnticipo").val());
-  var totalAnticipo = $(".totalAnticipos").text(anticipo);
-  var totalCobros = $(".totalCobros").text();
-  var totalIngresos = anticipo + Number(totalCobros);
-  $(".totalIngresos").text(totalIngresos);
-}
-
-async function limpiar() {
-  await Excel.run(async (context) => {
-    //var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
-    //var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxc");
-    //tablaDinamica.refresh();
-
-    $("input").val("");
-    $(".totales").text("0");
-    $("#newTable input:checked")
-      .parents("tr")
-      .remove();
-
-    await context.sync();
-  });
-}
-
-function tryCatch(callback) {
-  Promise.resolve()
-    .then(callback)
-    .catch(function(error) {
-      // Nota: En caso de producción se recomienda notificar del error por otro medio.
-      console.error(error);
+      }
+      $("#newTable tbody").after(item);
     });
-}
-
-
-};
-	
-function myFunction(myInput, myTable) {
-  var filterLista, tr, td, i, txtValue, trTabla, tdTabla, j, txtValueTabla;
-  //Lista
-  filterLista = $("#" + myInput)
-    .val()
-    .toUpperCase();
-  tr = $("#" + myTable).find("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-
-      if (txtValue.toUpperCase().indexOf(filterLista) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
   }
-  //Tabla
-  trTabla = $("#newTable").find("tr");
 
-  for (j = 0; j < trTabla.length; j++) {
-    tdTabla = trTabla[j].getElementsByTagName("td")[1];
-    if (tdTabla) {
-      txtValueTabla = tdTabla.textContent || tdTabla.innerText;
+  $(document).on("focusout", ".tbl-cobro", function() {
+    sumar();
+  });
 
-      if (txtValueTabla.toUpperCase().indexOf(filterLista) > -1) {
-        trTabla[j].style.display = "";
-      } else {
-        trTabla[j].style.display = "none";
-      }
-    }
+  $(document).on("focusout", "#inputAnticipo", function() {
+    sumaTotal();
+  });
+
+  function sumaTotal() {
+    var anticipo = Number($("#inputAnticipo").val());
+    var totalAnticipo = $(".totalAnticipos").text(anticipo);
+    var totalCobros = $(".totalCobros").text();
+    var totalIngresos = anticipo + Number(totalCobros);
+    $(".totalIngresos").text(totalIngresos);
   }
-};
+
+  async function limpiar() {
+    await Excel.run(async (context) => {
+      //var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
+      //var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxc");
+      //tablaDinamica.refresh();
+
+      $("input").val("");
+      $(".totales").text("0");
+      $("#newTable input:checked")
+        .parents("tr")
+        .remove();
+
+      await context.sync();
+    });
+  }
+
+  function tryCatch(callback) {
+    Promise.resolve()
+      .then(callback)
+      .catch(function(error) {
+        // Nota: En caso de producción se recomienda notificar del error por otro medio.
+        console.error(error);
+      });
+  }
+
+
 	
 </script>
 
@@ -472,7 +472,7 @@ function myFunction(myInput, myTable) {
 						<input type="text" id="inputNroDep" class="inputFormat" placeholder="No. Dp/Ch/Tr">
         </div>
 						<div class="col">
-							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipo $">
+							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipos $">
         </div>
 						</div>
 
