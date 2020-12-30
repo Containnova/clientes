@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<!-- Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+4  See LICENSE in the project root for license information -->
+
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>containnova</title>
+
+	<!--JAVASCRIPT-->
+	<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+	
+    <!--CSS -->
+    <!-- For the Office UI Fabric, go to http://aka.ms/office-ui-fabric to learn more. -->
+    <link rel="stylesheet" href="https://appsforoffice.microsoft.com/fabric/2.1.0/fabric.min.css">
+    <link rel="stylesheet" href="https://appsforoffice.microsoft.com/fabric/2.1.0/fabric.components.min.css">
+	
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
+    
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.structure.min.css" rel="stylesheet">
+	
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.theme.min.css" rel="stylesheet">
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+	
+	<link href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans" rel="stylesheet">
+	
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	
+	<!-- ESTILOS -->	
+	<style>
+		  * {
+  font-size: 14px;
+}
+
+.inputFormat {
+  width: 100%;
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  padding: 7px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.tableList {
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  display: none;
+  background-color: white;
+} 
+
+.tableList th, .tableList td {
+  text-align: left;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+/*seleccionar */
+.tableList tr.header, .tableList tr:hover {
+  background-color: #f1f1f1;
+}
+
+body {
+  background-color: #ddd;
+} 
+
+/* nuevos estilos */
+.cabecera {
+    color: #f1f1f1;
+    background: #996699;
+    font-family: 'Open Sans', sans-serif;
+}
+
+table.table {
+    table-layout: fixed;
+}
+
+table.table th:last-child {
+    width: 100px;
+}
+
+table.table td a {
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+    min-width: 24px;
+}    
+
+table.table td a.delete {
+    color: #E34724;
+}
+table.table td i {
+    font-size: 19px;
+}
+  
+table.table .form-control {
+    height: 32px;
+    line-height: 32px;
+    box-shadow: none;
+    border-radius: 2px;
+}
+table.table .form-control.error {
+    border-color: #f50000;
+}
+/* table.table td .add {
+    display: none;
+} */
+
+/* Material+Icons  */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/materialicons/v70/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+	</style>
+
+<!-- ScriptLab -->
+    <script src="https://bornholm-insiders.azurewebsites.net/libs/auth-helpers.js?hash=041ca614ce7a4eacfb2d"></script>
+    <script src="https://bornholm-insiders.azurewebsites.net/libs/maker.js?hash=041ca614ce7a4eacfb2d"></script>
+	<!-- otros -->
+		     <!-- office -->
+    <script crossorigin="anonymous" src="https://unpkg.com/core-js@2.4.1/client/core.min.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/jquery@3.1.1"></script>
+		
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+   
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js"></script>
+		
+<script>
+        window.ScriptLab = window.ScriptLab || {};
+        window.ScriptLab._strings = {"unexpectedError":"Ocurrió un error inesperado","authenticationWasCancelledByTheUser":"Authentication was cancelled by the user","officeVersionDoesNotSupportAuthentication":"Your current version of Office does not support displaying an authentication dialog. Please update to a newer version, or try Office Online, if you would like to run this snippet."};
+</script>
+		
+<script type="text/javascript">
+	
+Office.initialize = function() {
+$("#guardar").click(() => tryCatch(guardar));
+$("#limpiar").click(() => tryCatch(limpiar));
+
+Excel.run(async (context) => {
+  var hoja = context.workbook.worksheets.getItem("TBL");
+  var clientes = hoja.getRange("list_clientes").load();
+  var ingresos = hoja.getRange("tbl_ingresos").load();
+  var subServ = hoja.getRange("tbl_sub_serv").load();
+  var productos = hoja.getRange("tbl_productos").load();
+
+  await context.sync(); //resultados
+
+  cargarlista(clientes, "clientes");
+  cargarlista(ingresos, "ingresos");
+  cargarlista(subServ, "subServ");
+  cargarlista(productos, "productos");
+
+	$("table.tableList tbody tr").click(function() {
+    var tablaId = $(this)
+      .parent()
+      .parent("table")
+      .attr("id");
+    var inputId = $(this)
+      .parent()
+      .parent()
+      .parent()
+      .children("input")
+      .attr("id");
+    var item = $(this)
+      .find("td:last-child")
+      .text();
+    $("#" + inputId).val(item);
+    $("#" + tablaId).hide();
+  });
+
+});
+
+$("#datepicker").datepicker({
+  dateFormat: "dd/mm/yy",
+  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+  monthNames: [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+  ],
+  showButtonPanel: true,
+  currentText: "Hoy",
+  closeText: "Cerrar",
+  showWeek: true,
+  firstDay: 1
+});
+
+	
+	
+	
+function cargarlista(data, id) {
+  var item = "";
+  for (var i = 0; i < data.values.length; i++) {
+    item += `<tr><td>${data.values[i][0]}</td></tr>`;
+  }
+  $("#" + id).after(item);
+}
+
+
+$("input").click(function() {
+  var tableId = $(this)
+    .parent("div")
+    .children("table")
+    .attr("id");
+  $("#" + tableId).show();
+});
+
+/* nueva tabla */
+$(".add-new").click(function() {
+  var index = $("#newTable tbody tr:last-child").index();
+
+  var subServ, precio, cantidad, subTotal, tasaIva, iva, total;
+
+  subServ = $("#inpuntSubServicios").val();
+  cantidad = $("#cantidad").val();
+  precio = $("#precio").val();
+  tasaIva = $("#tasaIva").val();
+
+  subTotal = parseInt($(".subTotal").text());
+  subTotal = subTotal + cantidad * precio;
+  $(".subTotal").text(subTotal);
+  iva = parseInt($(".iva").text()) + cantidad * precio * (tasaIva / 100);
+  $(".iva").text(iva);
+  total = subTotal + iva;
+  $(".total").text(total);
+
+  var row = `<tr>
+    <td class="subServ">${subServ}</td>
+    <td class="cantidad">${cantidad}</td>
+    <td class="precio">${precio}</td>
+    <td class="tasaIva">${tasaIva}</td>
+    <td>
+    <a title="Delete" class="delete" data-toggle="tooltip"><i class="material-icons"></i></a>
+    </td>
+    </tr>`;
+
+  $("#newTable").append(row);
+
+  $("#inpuntSubServicios").val("");
+  $("#cantidad").val("");
+  $("#precio").val("");
+  $("#tasaIva").val("");
+  /*$("#newTable tbody tr")
+    .eq(index + 1)
+    .find(".add, .edit")
+    .toggle();*/
+});
+// Add row on add button click
+$(document).on("click", ".add", function() {
+  var empty = false;
+  var input = $(this)
+    .parents("tr")
+    .find('input[type="text"]');
+  input.each(function() {
+    if (!$(this).val()) {
+      $(this).addClass("error");
+      empty = true;
+    } else {
+      $(this).removeClass("error");
+    }
+  });
+  $(this)
+    .parents("tr")
+    .find(".error")
+    .first()
+    .focus();
+  if (!empty) {
+    input.each(function() {
+      $(this)
+        .parent("td")
+        .html($(this).val());
+    });
+    /*$(this)
+      .parents("tr")
+      .find(".add, .edit")
+      .toggle();*/
+    //$(".add-new").removeAttr("disabled");
+  }
+});
+
+
+$(document).on("click", ".delete", function() {
+  var precio, cantidad, subTotal, iva, tasaIva, total;
+
+  cantidad = $(this)
+    .parents("tr")
+    .find(".cantidad")
+    .text();
+  precio = $(this)
+    .parents("tr")
+    .find(".precio")
+    .text();
+  tasaIva = $(this)
+    .parents("tr")
+    .find(".tasaIva")
+    .text();
+
+  subTotal = parseInt($(".subTotal").text());
+  subTotal = subTotal - cantidad * precio;
+  $(".subTotal").text(subTotal);
+  iva = parseInt($(".iva").text()) - cantidad * precio * (tasaIva / 100);
+  $(".iva").text(iva);
+  total = subTotal + iva;
+  $(".total").text(total);
+
+  $(this)
+    .parents("tr")
+    .remove();
+  //$(".add-new").removeAttr("disabled");
+});
+
+async function guardar() {
+  await Excel.run(async (context) => {
+    var hoja = context.workbook.worksheets.getItem("BDD");
+    var expensesTable = hoja.tables.getItem("BDD");
+    OfficeExtension.config.extendedErrorLogging = true;
+    var cuenta = "Ingresos";
+    var cliente = $("#inputClientes").val();
+    var proveedor = "";
+    var fecha = $("#datepicker").val();
+    var nro_fact = $("#inputFactura").val();
+    var servicio_descripcion = $("#inputServicios").val();
+    var producto = $("#inputProductos").val();
+    var subServ, cantidad, precio_u, tasa, datos, query;
+
+	var date = new Date(fecha);
+	  
+    //var index = $("#newTable tbody tr:last-child").index(); ${}
+    datos = $("#newTable").find("tr:has(td)");
+    query = [];
+    //console.log(datos.length - 1);
+
+    for (var i = 0; i < datos.length; i++) {
+      subServ = datos
+        .eq(i)
+        .find($(".subServ"))
+        .text();
+      cantidad = datos
+        .eq(i)
+        .find($(".cantidad"))
+        .text();
+      precio_u = datos
+        .eq(i)
+        .find($(".precio"))
+        .text();
+      tasa = datos
+        .eq(i)
+        .find($(".tasaIva"))
+        .text();
+
+      query.push(
+        [
+          cuenta,
+          cliente,
+          proveedor,
+          "=DATE(" + date.getFullYear() + "," + date.getMonth() + "," + date.getDate() + ")",
+          nro_fact,
+          servicio_descripcion,
+          producto,
+          subServ,
+          cantidad,
+          precio_u,
+          tasa,
+          "=[@cantidad]*[@[precio_u]]",
+          "=[@[base_imp]]*[@tasa]%",
+          "=[@[base_imp]]+[@iva]",
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+		  ""
+        ]
+      );
+    }
+
+    //console.log(query);
+
+    expensesTable.rows.add(null, query);
+    limpiar()
+    await context.sync();
+  });
+}
+
+async function limpiar() {
+  await Excel.run(async (context) => {
+    $("input").val("");
+    $(".totales").text("0");
+    $("#newTable tbody tr").remove();
+
+    await context.sync();
+
+  });
+}
+
+function tryCatch(callback) {
+  Promise.resolve()
+    .then(callback)
+    .catch(function(error) {
+      // Nota: En caso de producción se recomienda notificar del error por otro medio.
+      console.error(error);
+    });
+}
+		
+};
+
+function myFunction(myInput, myTable) {
+  var input, filter, table, tr, td, i, txtValue;
+  filter = $("#" + myInput)
+    .val()
+    .toUpperCase();
+  tr = $("#" + myTable).find("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  };
+};
+</script>
+
+
+</head>
+
+<body>
+	<div class="container">
+	<div class="card text-center mt-3">
+		<img src="https://containnova.github.io/clientes/regisan/img/logo-regisan.png" style="max-height: 15vh;">
+		<div class="card-header">
+			<div class="row mt-3">
+				<div class="col-6">
+					<input type="text" id="inputClientes" class="inputFormat" onkeyup="myFunction('inputClientes','myTable1')" placeholder="Clientes" autocomplete="off">
+					<table id="myTable1" class="tableList">
+						<tbody>
+							<tr class="header" id="clientes">
+								<th>Seleccionar</th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="col-3">
+					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha">
+				</div>
+					<div class="col-3">
+						<input type="text" id="inputFactura" class="inputFormat" placeholder="Nro. Factura">
+								</div>
+					</div>
+
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="inputServicios" class="inputFormat" onkeyup="myFunction('inputServicios','myTable2')" placeholder="Servicios" autocomplete="off">
+							<table id="myTable2" class="tableList">
+								<tbody>
+									<tr class="header" id="ingresos">
+										<th>Seleccionar</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="inputProductos" class="inputFormat" onkeyup="myFunction('inputProductos','myTable4')" placeholder="Productos" autocomplete="off">
+							<table id="myTable4" class="tableList">
+								<tbody>
+									<tr class="header" id="productos">
+										<th>Seleccionar</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-4">
+							<input type="text" id="inpuntSubServicios" class="inputFormat" onkeyup="myFunction('inpuntSubServicios','myTable3')" placeholder="Sub Servicios" autocomplete="off">
+							<table id="myTable3" class="tableList">
+								<tbody>
+									<tr class="header" id="subServ">
+										<th>Seleccionar</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="col-2">
+							<input type="number" id="cantidad" class="inputFormat" placeholder="Cantidad" autocomplete="off">
+					</div>
+							<div class="col-3">
+								<input type="number" id="precio" class="inputFormat" placeholder="Precio U." autocomplete="off">
+						</div>
+								<div class="col-2">
+									<input type="number" id="tasaIva" class="inputFormat" placeholder="tasa" autocomplete="off">
+												</div>
+									<div class="col-1">
+										<button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i></button>
+									</div>
+								</div>
+
+								<!-- nueva tabla -->
+								<div class="">
+									<div class="">
+										<table class="table table-bordered" id="newTable">
+											<thead class="cabecera">
+												<tr>
+													<th>Sub Servicio</th>
+													<th>Cantidad</th>
+													<th>Precio</th>
+													<th>Tasa</th>
+													<th>Acciones</th>
+												</tr>
+											</thead>
+											<tbody>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<!-- fin nueva tabla -->
+								<div class="row">
+									<div class="col-4">
+										<b>
+										<div>Sub Total</div>
+										<div class="inputFormat totales subTotal">0</div>
+									</b>
+									</div>
+									<div class="col-4">
+										<b>
+										<div>IVA</div>
+										<div class="inputFormat totales iva">0</div>
+									</b>
+									</div>
+									<div class="col-4">
+										<b>
+										<div>Total</div>
+										<div class="inputFormat totales total">0</div>
+									</b>
+									</div>
+								</div>
+
+
+								<button id="guardar" type="button" class="btn btn-primary">Guardar</button>
+								<button id="limpiar" type="button" class="btn btn-danger">Limpiar</button>
+							</div>
+
+							<div class="card-footer text-muted">
+								Soporte <a href="mailto:info@containnova.com">info@containnova.com
+									<br>
+									<a href="https://www.containnova.com/">
+										<img src="https://www.containnova.com/_nuxt/img/LogoCompleto.6d70cf9.png" style="height: 5vh;">
+		          </a>
+							</div>
+						</div>
+					</div>
+
+		
+
+</body>
+</html>
