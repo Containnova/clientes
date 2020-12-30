@@ -176,6 +176,8 @@ $("#datepicker").datepicker({
   firstDay: 1
 });
 
+var rango = "";
+
 Excel.run(async (context) => {
   var hojaTBL = context.workbook.worksheets.getItem("TBL");
   var hojaBDD = context.workbook.worksheets.getItem("BDD");
@@ -189,10 +191,10 @@ Excel.run(async (context) => {
 
   await context.sync(); //resultados
 
-  var rango = "A4:C" + ultFila.rowCount;
+  rango = "A4:C" + ultFila.rowCount;
 
   cargarlista(clientes, "clientes");
-  estado(hojaEstados, rango);
+  estado(hojaEstados);
 
   $("table.tableList tbody tr").click(function() {
     var tablaId = $(this)
@@ -222,6 +224,7 @@ function cargarlista(data, id) {
 }
 
 
+	
 $("input").click(function() {
   var tableId = $(this)
     .parent("div")
@@ -259,7 +262,7 @@ async function guardar() {
     var cuenta = "Cobro";
     var cliente = $("#inputClientes").val();
     var proveedor = "";
-    var fecha = $("#datepicker").datepicker({ dateFormat: 'mm-dd-yy' }).val();
+    var fecha = $("#datepicker").val();
     var servicio_descripcion = $("#inputPago").val(); //forma de pago
     var nro_dep_pag = $("#inputNroDep").val();
     var anticipo = $("#inputAnticipo").val();
@@ -272,7 +275,7 @@ async function guardar() {
         cuenta,
         cliente,
         proveedor,
-        '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+        fecha,
         "ANTICIPOS",
         "Anticipo:" + servicio_descripcion,
         "",
@@ -313,7 +316,7 @@ async function guardar() {
         cuenta,
         tbl_cliente,
         proveedor,
-        '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+        fecha,
         tbl_nro_fact,
         servicio_descripcion,
         "",
@@ -337,6 +340,26 @@ async function guardar() {
     expensesTable.rows.add(null, query);
     limpiar();
     await context.sync();
+  });
+}
+
+async function estado(datos) {
+  await Excel.run(async (context) => {
+    //console.log(rango);
+    var data = datos.getRange(rango).load("values");
+    await context.sync();
+    //console.log(data.values);
+    var item = "";
+    for (var i = 0; i < data.values.length; i++) {
+      item += `<tr>
+        <td><input type="checkbox" onclick="checkbox(${i})" class="form-check-input" data-check="${i}"></td>
+        <td class="tbl-cliente">${data.values[i][0]}</td>
+        <td class="tbl-factura">${data.values[i][1]}</td>
+        <td id="${i}">${data.values[i][2]}</td>
+        <td><input type="text" id="${i}" class="form-control tbl-cobro"></td>
+      </tr>`;
+    }
+    $("#newTable tbody").after(item);
   });
 }
 
@@ -420,25 +443,6 @@ function myFunction(myInput, myTable) {
   }
 };
 	
-async function estado(datos, rangos) {
-  await Excel.run(async (context) => {
-    var data = datos.getRange(rangos).load("values");
-    await context.sync();
-    //console.log(data.values);
-    var item = "";
-    for (var i = 0; i < data.values.length; i++) {
-      item += `<tr>
-        <td><input type="checkbox" onclick="checkbox(${i})" class="form-check-input" data-check="${i}"></td>
-        <td class="tbl-cliente">${data.values[i][0]}</td>
-        <td class="tbl-factura">${data.values[i][1]}</td>
-        <td id="${i}">${data.values[i][2]}</td>
-        <td><input type="text" id="${i}" class="form-control tbl-cobro"></td>
-      </tr>`;
-    }
-    $("#newTable tbody").after(item);
-  });
-}
-	
 </script>
 
 
@@ -468,7 +472,7 @@ async function estado(datos, rangos) {
 						<input type="text" id="inputNroDep" class="inputFormat" placeholder="No. Dp/Ch/Tr">
         </div>
 						<div class="col">
-							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipos $">
+							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipo $">
         </div>
 						</div>
 
