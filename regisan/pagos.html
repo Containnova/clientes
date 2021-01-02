@@ -147,234 +147,230 @@ table.table .form-control.error {
 		
 <script type="text/javascript">
 
-Office.onReady(function (info) {
-$("#guardar").click(() => tryCatch(guardar));
-$("#limpiar").click(() => tryCatch(limpiar));
+Office.onReady(function(info) {
+  $("#guardar").click(() => tryCatch(guardar));
+  $("#limpiar").click(() => tryCatch(limpiar));
 
-$("#datepicker").datepicker({
-  dateFormat: "dd/mm/yy",
-  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-  monthNames: [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
-  ],
-  showButtonPanel: true,
-  currentText: "Hoy",
-  closeText: "Cerrar",
-  showWeek: true,
-  firstDay: 1
-});
+  $("#datepicker").datepicker({
+    dateFormat: "dd/mm/yy",
+    dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+    monthNames: [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    showButtonPanel: true,
+    currentText: "Hoy",
+    closeText: "Cerrar",
+    showWeek: true,
+    firstDay: 1
+  });
   var rango = "";
-Excel.run(async (context) => {
-  var hojaTBL = context.workbook.worksheets.getItem("TBL");
-  var hojaBDD = context.workbook.worksheets.getItem("BDD");
-  var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
-  var proveedores = hojaTBL.getRange("list_proveedores").load();
-  var clientes = hojaTBL.getRange("list_clientes").load();
-  //var tablaBDD = hojaBDD.tables.getItem("BDD");
-  //var tablaBDD_datos = tablaBDD.getDataBodyRange().load("values");
-  var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxp");
-  tablaDinamica.refresh();
-  var ultFila = tablaDinamica.layout.getDataBodyRange().load("rowCount");
-
-  await context.sync(); //resultados
-
-  rango = "E4:G" + ultFila.rowCount;
-
-  cargarlista(proveedores, "proveedores");
-  cargarlista(clientes, "clientes");
-  estado();
-
-  $("table.tableList tbody tr").click(function() {
-    var tablaId = $(this)
-      .parent()
-      .parent("table")
-      .attr("id");
-    var inputId = $(this)
-      .parent()
-      .parent()
-      .parent()
-      .children("input")
-      .attr("id");
-    var item = $(this)
-      .find("td:last-child")
-      .text();
-    $("#" + inputId).val(item);
-    $("#" + tablaId).hide();
-  });
-});
-
-function cargarlista(data, id) {
-  var item = "";
-  for (var i = 0; i < data.values.length; i++) {
-    item += `<tr><td>${data.values[i][0]}</td></tr>`;
-  }
-  $("#" + id).after(item);
-}
-
-
-$("input").click(function() {
-  var tableId = $(this)
-    .parent("div")
-    .children("table")
-    .attr("id");
-  $("#" + tableId).show();
-});
-
-
-async function guardar() {
-  await Excel.run(async (context) => {
-    var hoja = context.workbook.worksheets.getItem("BDD");
-    var expensesTable = hoja.tables.getItem("BDD");
-    //OfficeExtension.config.extendedErrorLogging = true;
-    var cuenta = "Pago";
-    var cliente = $("#inputClientes").val();
-    var proveedor = $("#inputProveedores").val();
-    var fecha = $("#datepicker").val();
-    var servicio_descripcion = $("#inputPago").val(); //forma de pago
-    var nro_dep_pag = $("#inputNroDep").val();
-    var anticipo = $("#inputAnticipo").val();
-    var tbl_proveedor, tbl_nro_fact, tbl_pago, datos, query;
-
-    query = [];
-
-    if (anticipo != 0) {
-      query.push([
-        cuenta,
-        cliente,
-        proveedor,
-        '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
-        "ANTICIPOS",
-        "Anticipo:" + servicio_descripcion,
-        "",
-        "",
-        0,
-        0,
-        0,
-        0,
-        0,
-        anticipo,
-        "=YEAR([@fecha])",
-        '=UPPER(TEXT([@fecha],"mmmm"))',
-        '=IF([@proveedor]<>"","Proveedor","Cliente")',
-        '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
-        "=ROW()-1",
-        nro_dep_pag
-      ]);
-    }
-
-    $("#newTable input:checked").each(function() {
-      tbl_proveedor = $(this)
-        .parents("tr")
-        .children("td.tbl-proveedor")
-        .text();
-
-      tbl_nro_fact = $(this)
-        .parents("tr")
-        .children("td.tbl-factura")
-        .text();
-
-      tbl_pago = $(this)
-        .parents("tr")
-        .children("td")
-        .find("input.tbl-pago")
-        .val();
-
-      query.push([
-        cuenta,
-        cliente,
-        tbl_proveedor,
-        '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
-        tbl_nro_fact,
-        servicio_descripcion,
-        "",
-        "",
-        0,
-        0,
-        0,
-        0,
-        0,
-        tbl_pago,
-        "=YEAR([@fecha])",
-        '=UPPER(TEXT([@fecha],"mmmm"))',
-        '=IF([@proveedor]<>"","Proveedor","Cliente")',
-        '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
-        "=ROW()-1",
-        nro_dep_pag
-      ]);
-    });
-    //console.log(query);
-
-    expensesTable.rows.add(null, query);
-    limpiar();
-    await context.sync();
-  });
-}
-
-async function estado() {
-  await Excel.run(async (context) => {
+  Excel.run(async (context) => {
+    var hojaTBL = context.workbook.worksheets.getItem("TBL");
+    var hojaBDD = context.workbook.worksheets.getItem("BDD");
     var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
-    var data = hojaEstados.getRange(rango).load("values");
-    await context.sync();
-    //console.log(data.values);
+    var proveedores = hojaTBL.getRange("list_proveedores").load();
+    //var clientes = hojaTBL.getRange("list_clientes").load();
+    //var tablaBDD = hojaBDD.tables.getItem("BDD");
+    //var tablaBDD_datos = tablaBDD.getDataBodyRange().load("values");
+    var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxp");
+    tablaDinamica.refresh();
+    var ultFila = tablaDinamica.layout.getDataBodyRange().load("rowCount");
+
+    await context.sync(); //resultados
+
+    rango = "E4:G" + ultFila.rowCount;
+
+    cargarlista(proveedores, "proveedores");
+    //cargarlista(clientes, "clientes");
+    estado();
+
+    $("table.tableList tbody tr").click(function() {
+      var tablaId = $(this)
+        .parent()
+        .parent("table")
+        .attr("id");
+      var inputId = $(this)
+        .parent()
+        .parent()
+        .parent()
+        .children("input")
+        .attr("id");
+      var item = $(this)
+        .find("td:last-child")
+        .text();
+      $("#" + inputId).val(item);
+      $("#" + tablaId).hide();
+    });
+  });
+
+  function cargarlista(data, id) {
     var item = "";
     for (var i = 0; i < data.values.length; i++) {
-      item += `<tr>
+      item += `<tr><td>${data.values[i][0]}</td></tr>`;
+    }
+    $("#" + id).after(item);
+  }
+
+  $("input").click(function() {
+    var tableId = $(this)
+      .parent("div")
+      .children("table")
+      .attr("id");
+    $("#" + tableId).show();
+  });
+
+  async function guardar() {
+    await Excel.run(async (context) => {
+      var hoja = context.workbook.worksheets.getItem("BDD");
+      var expensesTable = hoja.tables.getItem("BDD");
+      //OfficeExtension.config.extendedErrorLogging = true;
+      var cuenta = "Pago";
+      //var cliente = $("#inputClientes").val();
+      var proveedor = $("#inputProveedores").val();
+      var fecha = $("#datepicker").val();
+      var servicio_descripcion = $("#inputPago").val(); //forma de pago
+      var nro_dep_pag = $("#inputNroDep").val();
+      var anticipo = $("#inputAnticipo").val();
+      var tbl_proveedor, tbl_nro_fact, tbl_pago, datos, query;
+
+      query = [];
+
+      if (anticipo != 0) {
+        query.push([
+          cuenta,
+          "",
+          proveedor,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+          "ANTICIPOS",
+          "Anticipo:" + servicio_descripcion,
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          anticipo,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          nro_dep_pag
+        ]);
+      }
+
+      $("#newTable input:checked").each(function() {
+        tbl_proveedor = $(this)
+          .parents("tr")
+          .children("td.tbl-proveedor")
+          .text();
+
+        tbl_nro_fact = $(this)
+          .parents("tr")
+          .children("td.tbl-factura")
+          .text();
+
+        tbl_pago = $(this)
+          .parents("tr")
+          .children("td")
+          .find("input.tbl-pago")
+          .val();
+
+        query.push([
+          cuenta,
+          "",
+          tbl_proveedor,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+          tbl_nro_fact,
+          servicio_descripcion,
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          tbl_pago,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          nro_dep_pag
+        ]);
+      });
+      //console.log(query);
+
+      expensesTable.rows.add(null, query);
+      limpiar();
+      await context.sync();
+    });
+  }
+
+  async function estado() {
+    await Excel.run(async (context) => {
+      var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
+      var data = hojaEstados.getRange(rango).load("values");
+      await context.sync();
+      //console.log(data.values);
+      var item = "";
+      for (var i = 0; i < data.values.length; i++) {
+        item += `<tr>
         <td><input type="checkbox" onclick="checkbox(${i})" class="form-check-input" data-check="${i}"></td>
         <td class="tbl-proveedor">${data.values[i][0]}</td>
         <td class="tbl-factura">${data.values[i][1]}</td>
         <td id="${i}">${data.values[i][2] * -1}</td>
         <td><input type="text" id="${i}" class="form-control tbl-pago"></td>
       </tr>`;
-    }
-    $("#newTable tbody").after(item);
-  });
-}
-
-$(document).on("focusout", ".tbl-pago", function() {
-  sumar();
-});
-
-$(document).on("focusout", "#inputAnticipo", function() {
-  sumaTotal();
-});
-
-
-
-async function limpiar() {
-  await Excel.run(async (context) => {
-    //var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
-    //var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxc");
-    //tablaDinamica.refresh();
-
-    $("input").val("");
-    $(".totales").text("0");
-    $("#newTable input:checked")
-      .parents("tr")
-      .remove();
-
-    await context.sync();
-  });
-}
-
-function tryCatch(callback) {
-  Promise.resolve()
-    .then(callback)
-    .catch(function(error) {
-      // Nota: En caso de producción se recomienda notificar del error por otro medio.
-      console.error(error);
+      }
+      $("#newTable tbody").after(item);
     });
-}
+  }
+
+  $(document).on("focusout", ".tbl-pago", function() {
+    sumar();
+  });
+
+  $(document).on("focusout", "#inputAnticipo", function() {
+    sumaTotal();
+  });
+
+  async function limpiar() {
+    await Excel.run(async (context) => {
+      //var hojaEstados = context.workbook.worksheets.getItem("ESTADOS");
+      //var tablaDinamica = hojaEstados.pivotTables.getItem("tbld_cxc");
+      //tablaDinamica.refresh();
+
+      $("input").val("");
+      $(".totales").text("0");
+      $("#newTable input:checked")
+        .parents("tr")
+        .remove();
+
+      await context.sync();
+    });
+  }
+
+  function tryCatch(callback) {
+    Promise.resolve()
+      .then(callback)
+      .catch(function(error) {
+        // Nota: En caso de producción se recomienda notificar del error por otro medio.
+        console.error(error);
+      });
+  }
 });
 function myFunction(myInput, myTable) {
   var filterLista, tr, td, i, txtValue, trTabla, tdTabla, j, txtValueTabla;
@@ -410,7 +406,7 @@ function myFunction(myInput, myTable) {
       }
     }
   }
-};
+}
 function checkbox(id) {
   var check = $("input[data-check='" + id + "']").prop("checked");
   var monto = $("td[id='" + id + "']").text();
@@ -421,23 +417,23 @@ function checkbox(id) {
     $("input[id='" + id + "']").val("");
   }
   sumar();
-};
+}
 
 function sumar() {
   var sum = 0;
-  $(".tbl-pago").each(function () {
+  $(".tbl-pago").each(function() {
     sum += Number($(this).val());
   });
   $(".totalPagos").text(sum);
   sumaTotal();
-};
+}
 function sumaTotal() {
   var anticipo = Number($("#inputAnticipo").val());
   var totalAnticipo = $(".totalAnticipos").text(anticipo);
   var totalPagos = $(".totalPagos").text();
   var totalIngresos = anticipo + Number(totalPagos);
   $(".totalEgresos").text(totalIngresos);
-};
+}
 
 </script>
 
@@ -478,18 +474,6 @@ function sumaTotal() {
 								<table id="myTable1" class="tableList">
 									<tbody>
 										<tr class="header" id="proveedores">
-											<th>Seleccionar</th>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-12">
-								<input type="text" id="inputClientes" class="inputFormat" onkeyup="myFunction('inputClientes','myTable2')" placeholder="Relacionado con el cliente" autocomplete="off">
-								<table id="myTable2" class="tableList">
-									<tbody>
-										<tr class="header" id="clientes">
 											<th>Seleccionar</th>
 										</tr>
 									</tbody>
