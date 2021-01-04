@@ -147,108 +147,107 @@ table.table .form-control.error {
 		
 <script type="text/javascript">
 	
-Office.initialize = function() {
+Office.onReady(function(info) {
+  $("#guardar").click(() => tryCatch(guardar));
+  $("#limpiar").click(() => tryCatch(limpiar));
 
-$("#guardar").click(() => tryCatch(guardar));
-$("#limpiar").click(() => tryCatch(limpiar));
-
-$("#datepicker").datepicker({
-  dateFormat: "dd/mm/yy",
-  dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-  monthNames: [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
-  ],
-  showButtonPanel: true,
-  currentText: "Hoy",
-  closeText: "Cerrar",
-  showWeek: true,
-  firstDay: 1
-});
-
-Excel.run(async (context) => {
-  var hoja = context.workbook.worksheets.getItem("TBL");
-  var proveedores = hoja.getRange("list_proveedores").load();
-  var clientes = hoja.getRange("list_clientes").load();
-  var egresos = hoja.getRange("tbl_egresos").load();
-  var subServ = hoja.getRange("tbl_sub_serv").load();
-  var productos = hoja.getRange("tbl_productos").load();
-
-  await context.sync(); //resultados
-
-  cargarlista(proveedores, "proveedores");
-  cargarlista(clientes, "clientes");
-  cargarlista(egresos, "egresos");
-  cargarlista(subServ, "subServ");
-  cargarlista(productos, "productos");
-
-  $("table.tableList tbody tr").click(function() {
-    var tablaId = $(this)
-      .parent()
-      .parent("table")
-      .attr("id");
-    var inputId = $(this)
-      .parent()
-      .parent()
-      .parent()
-      .children("input")
-      .attr("id");
-    var item = $(this)
-      .find("td:last-child")
-      .text();
-    $("#" + inputId).val(item);
-    $("#" + tablaId).hide();
+  $("#datepicker").datepicker({
+    dateFormat: "dd/mm/yy",
+    dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+    monthNames: [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    showButtonPanel: true,
+    currentText: "Hoy",
+    closeText: "Cerrar",
+    showWeek: true,
+    firstDay: 1
   });
-});
 
-function cargarlista(data, id) {
-  var item = "";
-  for (var i = 0; i < data.values.length; i++) {
-    item += `<tr><td>${data.values[i][0]}</td></tr>`;
+  Excel.run(async (context) => {
+    var hoja = context.workbook.worksheets.getItem("TBL");
+    var proveedores = hoja.getRange("list_proveedores").load();
+    var clientes = hoja.getRange("list_clientes").load();
+    var egresos = hoja.getRange("tbl_egresos").load();
+    var subServ = hoja.getRange("tbl_sub_serv").load();
+    var productos = hoja.getRange("tbl_productos").load();
+
+    await context.sync(); //resultados
+
+    cargarlista(proveedores, "proveedores");
+    cargarlista(clientes, "clientes");
+    cargarlista(egresos, "egresos");
+    cargarlista(subServ, "subServ");
+    cargarlista(productos, "productos");
+
+    $("table.tableList tbody tr").click(function() {
+      var tablaId = $(this)
+        .parent()
+        .parent("table")
+        .attr("id");
+      var inputId = $(this)
+        .parent()
+        .parent()
+        .parent()
+        .children("input")
+        .attr("id");
+      var item = $(this)
+        .find("td:last-child")
+        .text();
+      $("#" + inputId).val(item);
+      $("#" + tablaId).hide();
+    });
+  });
+
+  function cargarlista(data, id) {
+    var item = "";
+    for (var i = 0; i < data.values.length; i++) {
+      item += `<tr><td>${data.values[i][0]}</td></tr>`;
+    }
+    $("#" + id).after(item);
   }
-  $("#" + id).after(item);
-}
 
+  $("input").click(function() {
+    var tableId = $(this)
+      .parent("div")
+      .children("table")
+      .attr("id");
+    $("#" + tableId).show();
+  });
 
+  /* nueva tabla */
+  $(".add-new").click(function() {
+    var index = $("#newTable tbody tr:last-child").index();
 
-$("input").click(function() {
-  var tableId = $(this)
-    .parent("div")
-    .children("table")
-    .attr("id");
-  $("#" + tableId).show();
-});
+    var subServ, precio, cantidad, subTotal, tasaIva, iva, total;
 
-/* nueva tabla */
-$(".add-new").click(function() {
-  var index = $("#newTable tbody tr:last-child").index();
+    subServ = $("#inpuntSubServicios").val();
+    cantidad = $("#cantidad").val();
+    precio = $("#precio").val();
+    tasaIva = $("#tasaIva").val();
 
-  var subServ, precio, cantidad, subTotal, tasaIva, iva, total;
+    subTotal = parseInt($(".subTotal").text());
+    subTotal = subTotal + cantidad * precio;
+    $(".subTotal").text(subTotal);
+    iva = parseInt($(".iva").text()) + cantidad * precio * (tasaIva / 100);
+    $(".iva").text(iva);
+    total = subTotal + iva;
+    $(".total").text(total);
 
-  subServ = $("#inpuntSubServicios").val();
-  cantidad = $("#cantidad").val();
-  precio = $("#precio").val();
-  tasaIva = $("#tasaIva").val();
+    totalGenral();
 
-  subTotal = parseInt($(".subTotal").text());
-  subTotal = subTotal + cantidad * precio;
-  $(".subTotal").text(subTotal);
-  iva = parseInt($(".iva").text()) + cantidad * precio * (tasaIva / 100);
-  $(".iva").text(iva);
-  total = subTotal + iva;
-  $(".total").text(total);
-
-  var row = `<tr>
+    var row = `<tr>
     <td class="subServ">${subServ}</td>
     <td class="cantidad">${cantidad}</td>
     <td class="precio">${precio}</td>
@@ -258,170 +257,199 @@ $(".add-new").click(function() {
     </td>
     </tr>`;
 
-  $("#newTable").append(row);
+    $("#newTable").append(row);
 
-  $("#inpuntSubServicios").val("");
-  $("#cantidad").val("");
-  $("#precio").val("");
-  $("#tasaIva").val("");
-  /*$("#newTable tbody tr")
-    .eq(index + 1)
-    .find(".add, .edit")
-    .toggle();*/
-});
-// Add row on add button click
-$(document).on("click", ".add", function() {
-  var empty = false;
-  var input = $(this)
-    .parents("tr")
-    .find('input[type="text"]');
-  input.each(function() {
-    if (!$(this).val()) {
-      $(this).addClass("error");
-      empty = true;
-    } else {
-      $(this).removeClass("error");
-    }
-  });
-  $(this)
-    .parents("tr")
-    .find(".error")
-    .first()
-    .focus();
-  if (!empty) {
-    input.each(function() {
-      $(this)
-        .parent("td")
-        .html($(this).val());
-    });
-    /*$(this)
-      .parents("tr")
+    $("#inpuntSubServicios").val("");
+    $("#cantidad").val("");
+    $("#precio").val("");
+    $("#tasaIva").val("");
+    /*$("#newTable tbody tr")
+      .eq(index + 1)
       .find(".add, .edit")
       .toggle();*/
+  });
+  // Add row on add button click
+  $(document).on("click", ".add", function() {
+    var empty = false;
+    var input = $(this)
+      .parents("tr")
+      .find('input[type="text"]');
+    input.each(function() {
+      if (!$(this).val()) {
+        $(this).addClass("error");
+        empty = true;
+      } else {
+        $(this).removeClass("error");
+      }
+    });
+    $(this)
+      .parents("tr")
+      .find(".error")
+      .first()
+      .focus();
+    if (!empty) {
+      input.each(function() {
+        $(this)
+          .parent("td")
+          .html($(this).val());
+      });
+      /*$(this)
+        .parents("tr")
+        .find(".add, .edit")
+        .toggle();*/
+      //$(".add-new").removeAttr("disabled");
+    }
+  });
+
+  $(document).on("click", ".delete", function() {
+    var precio, cantidad, subTotal, iva, tasaIva, total;
+
+    cantidad = $(this)
+      .parents("tr")
+      .find(".cantidad")
+      .text();
+    precio = $(this)
+      .parents("tr")
+      .find(".precio")
+      .text();
+    tasaIva = $(this)
+      .parents("tr")
+      .find(".tasaIva")
+      .text();
+
+    subTotal = parseInt($(".subTotal").text());
+    subTotal = subTotal - cantidad * precio;
+    $(".subTotal").text(subTotal);
+    iva = parseInt($(".iva").text()) - cantidad * precio * (tasaIva / 100);
+    $(".iva").text(iva);
+    total = subTotal + iva;
+    $(".total").text(total);
+
+    totalGenral();
+
+    $(this)
+      .parents("tr")
+      .remove();
     //$(".add-new").removeAttr("disabled");
+  });
+
+  async function guardar() {
+    await Excel.run(async (context) => {
+      var hoja = context.workbook.worksheets.getItem("BDD");
+      var expensesTable = hoja.tables.getItem("BDD");
+      OfficeExtension.config.extendedErrorLogging = true;
+      var cuenta = "Egresos";
+      var cliente = $("#inputClientes").val();
+      var proveedor = $("#inputProveedores").val();
+      var fecha = $("#datepicker")
+        .datepicker({ dateFormat: "mm-dd-yy" })
+        .val();
+      var nro_fact = $("#inputFactura").val();
+      var servicio_descripcion = $("#inputServicios").val();
+      var producto = $("#inputProductos").val();
+      var subServ, cantidad, precio_u, tasa, datos, query;
+
+      //var index = $("#newTable tbody tr:last-child").index(); ${}
+      datos = $("#newTable").find("tr:has(td)");
+      query = [];
+      //console.log(datos.length - 1);
+
+      for (var i = 0; i < datos.length; i++) {
+        subServ = datos
+          .eq(i)
+          .find($(".subServ"))
+          .text();
+        cantidad = datos
+          .eq(i)
+          .find($(".cantidad"))
+          .text();
+        precio_u = datos
+          .eq(i)
+          .find($(".precio"))
+          .text();
+        tasa = datos
+          .eq(i)
+          .find($(".tasaIva"))
+          .text();
+
+        query.push([
+          cuenta,
+          cliente,
+          proveedor,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+          nro_fact,
+          servicio_descripcion,
+          producto,
+          subServ,
+          cantidad,
+          precio_u * -1,
+          tasa,
+          "=[@cantidad]*[@[precio_u]]",
+          "=[@[base_imp]]*[@tasa]%",
+          "=[@[base_imp]]+[@iva]",
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          ""
+        ]);
+      }
+
+      //retenciones
+      if ($("#retencion").val() != "" && $("#retencion").val() != 0) {
+        var retenciones = $("#retencion").val();
+        query.push([
+          "Pago",
+          "",
+          proveedor,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+          nro_fact,
+          "Retenciones - Modulo: Egresos",
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          retenciones,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          "Fac: " + nro_fact
+        ]);
+      }
+
+      //console.log(query);
+
+      expensesTable.rows.add(null, query);
+      limpiar();
+      await context.sync();
+    });
+  }
+
+  async function limpiar() {
+    await Excel.run(async (context) => {
+      $("input").val("");
+      $(".totales").text("0");
+      $("#newTable tbody tr").remove();
+
+      await context.sync();
+    });
+  }
+
+  function tryCatch(callback) {
+    Promise.resolve()
+      .then(callback)
+      .catch(function(error) {
+        // Nota: En caso de producción se recomienda notificar del error por otro medio.
+        console.error(error);
+      });
   }
 });
-
-$(document).on("click", ".delete", function() {
-  var precio, cantidad, subTotal, iva, tasaIva, total;
-
-  cantidad = $(this)
-    .parents("tr")
-    .find(".cantidad")
-    .text();
-  precio = $(this)
-    .parents("tr")
-    .find(".precio")
-    .text();
-  tasaIva = $(this)
-    .parents("tr")
-    .find(".tasaIva")
-    .text();
-
-  subTotal = parseInt($(".subTotal").text());
-  subTotal = subTotal - cantidad * precio;
-  $(".subTotal").text(subTotal);
-  iva = parseInt($(".iva").text()) - cantidad * precio * (tasaIva / 100);
-  $(".iva").text(iva);
-  total = subTotal + iva;
-  $(".total").text(total);
-
-  $(this)
-    .parents("tr")
-    .remove();
-  //$(".add-new").removeAttr("disabled");
-});
-
-async function guardar() {
-  await Excel.run(async (context) => {
-    var hoja = context.workbook.worksheets.getItem("BDD");
-    var expensesTable = hoja.tables.getItem("BDD");
-    OfficeExtension.config.extendedErrorLogging = true;
-    var cuenta = "Egresos";
-    var cliente = $("#inputClientes").val();
-    var proveedor = $("#inputProveedores").val();
-    var fecha = $("#datepicker").datepicker({ dateFormat: 'mm-dd-yy' }).val();
-    var nro_fact = $("#inputFactura").val();
-    var servicio_descripcion = $("#inputServicios").val();
-    var producto = $("#inputProductos").val();
-    var subServ, cantidad, precio_u, tasa, datos, query;
-
-    //var index = $("#newTable tbody tr:last-child").index(); ${}
-    datos = $("#newTable").find("tr:has(td)");
-    query = [];
-    //console.log(datos.length - 1);
-
-    for (var i = 0; i < datos.length; i++) {
-      subServ = datos
-        .eq(i)
-        .find($(".subServ"))
-        .text();
-      cantidad = datos
-        .eq(i)
-        .find($(".cantidad"))
-        .text();
-      precio_u = datos
-        .eq(i)
-        .find($(".precio"))
-        .text();
-      tasa = datos
-        .eq(i)
-        .find($(".tasaIva"))
-        .text();
-
-      query.push([
-        cuenta,
-        cliente,
-        proveedor,
-        '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
-        nro_fact,
-        servicio_descripcion,
-        producto,
-        subServ,
-        cantidad,
-        precio_u * -1,
-        tasa,
-        "=[@cantidad]*[@[precio_u]]",
-        "=[@[base_imp]]*[@tasa]%",
-        "=[@[base_imp]]+[@iva]",
-        "=YEAR([@fecha])",
-        '=UPPER(TEXT([@fecha],"mmmm"))',
-        '=IF([@proveedor]<>"","Proveedor","Cliente")',
-        '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
-        "=ROW()-1",
-        ""
-      ]);
-    }
-
-    //console.log(query);
-
-    expensesTable.rows.add(null, query);
-    limpiar();
-    await context.sync();
-  });
-}
-
-async function limpiar() {
-  await Excel.run(async (context) => {
-    $("input").val("");
-    $(".totales").text("0");
-    $("#newTable tbody tr").remove();
-
-    await context.sync();
-  });
-}
-
-function tryCatch(callback) {
-  Promise.resolve()
-    .then(callback)
-    .catch(function(error) {
-      // Nota: En caso de producción se recomienda notificar del error por otro medio.
-      console.error(error);
-    });
-}
-
-
-};
 
 function myFunction(myInput, myTable) {
   var input, filter, table, tr, td, i, txtValue;
@@ -440,7 +468,21 @@ function myFunction(myInput, myTable) {
       }
     }
   }
-};
+}
+
+function totalGenral() {
+  var retencion = $("#retencion").val() == "" ? 0 : $("#retencion").val();
+  var total = parseInt($(".total").text()) - parseInt(retencion);
+  $(".totalGeneral").text(total);
+  //console.log(total);
+}
+
+$(document).on("focusout", "#retencion", function() {
+  //console.log("aqui");
+  totalGenral();
+});
+
+	
 </script>
 
 
@@ -453,22 +495,25 @@ function myFunction(myInput, myTable) {
 		<img src="https://containnova.github.io/clientes/regisan/img/logo-regisan.png" style="max-height: 15vh;">
 		<div class="card-header">
 			<div class="row mt-3">
-				<div class="col-6">
-					<input type="text" id="inputProveedores" class="inputFormat" onkeyup="myFunction('inputProveedores','myTable1')" placeholder="Proveedores" autocomplete="off">
-					<table id="myTable1" class="tableList">
-						<tbody>
-							<tr class="header" id="proveedores">
-								<th>Seleccionar</th>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div class="col-3">
+
+				<div class="col">
 					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha">
 				</div>
-					<div class="col-3">
+					<div class="col">
 						<input type="text" id="inputFactura" class="inputFormat" placeholder="No. Factura">
 								</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="inputProveedores" class="inputFormat" onkeyup="myFunction('inputProveedores','myTable1')" placeholder="Proveedores" autocomplete="off">
+							<table id="myTable1" class="tableList">
+								<tbody>
+									<tr class="header" id="proveedores">
+										<th>Seleccionar</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 
 					<div class="row">
@@ -511,7 +556,7 @@ function myFunction(myInput, myTable) {
 					</div>
 
 					<div class="row">
-						<div class="col-4">
+						<div class="col-6">
 							<input type="text" id="inpuntSubServicios" class="inputFormat" onkeyup="myFunction('inpuntSubServicios','myTable3')" placeholder="Sub Servicios" autocomplete="off">
 							<table id="myTable3" class="tableList">
 								<tbody>
@@ -521,14 +566,14 @@ function myFunction(myInput, myTable) {
 								</tbody>
 							</table>
 						</div>
-						<div class="col-2">
+						<div class="col-6">
 							<input type="number" id="cantidad" class="inputFormat" placeholder="Cantidad" autocomplete="off">
 					</div>
-							<div class="col-3">
+							<div class="col-6">
 								<input type="number" id="precio" class="inputFormat" placeholder="Precio U." autocomplete="off">
 						</div>
-								<div class="col-2">
-									<input type="number" id="tasaIva" class="inputFormat" placeholder="tasa" autocomplete="off">
+								<div class="col-4">
+									<input type="number" id="tasaIva" class="inputFormat" placeholder="Tasa IVA" autocomplete="off">
 												</div>
 									<div class="col-1">
 										<button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i></button>
@@ -572,6 +617,18 @@ function myFunction(myInput, myTable) {
 										<div>Total</div>
 										<div class="inputFormat totales total">0</div>
 									</b>
+									</div>
+									<div class="col-6">
+										<b>
+											<div>Retenciones</div>
+											<input type="number" id="retencion" class="inputFormat totales retencion" placeholder="Monto Retenido" autocomplete="off">
+											</b>
+									</div>
+									<div class="col-6">
+										<b>
+											<div>Total General</div>
+											<div class="inputFormat totales totalGeneral">0</div>
+										</b>
 									</div>
 								</div>
 
