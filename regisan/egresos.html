@@ -237,10 +237,10 @@ Office.onReady(function(info) {
     precio = $("#precio").val();
     tasaIva = $("#tasaIva").val();
 
-    subTotal = parseInt($(".subTotal").text());
+    subTotal = parseFloat($(".subTotal").text());
     subTotal = subTotal + cantidad * precio;
     $(".subTotal").text(subTotal);
-    iva = parseInt($(".iva").text()) + cantidad * precio * (tasaIva / 100);
+    iva = parseFloat($(".iva").text()) + cantidad * precio * (tasaIva / 100);
     $(".iva").text(iva);
     total = subTotal + iva;
     $(".total").text(total);
@@ -317,10 +317,10 @@ Office.onReady(function(info) {
       .find(".tasaIva")
       .text();
 
-    subTotal = parseInt($(".subTotal").text());
+    subTotal = parseFloat($(".subTotal").text());
     subTotal = subTotal - cantidad * precio;
     $(".subTotal").text(subTotal);
-    iva = parseInt($(".iva").text()) - cantidad * precio * (tasaIva / 100);
+    iva = parseFloat($(".iva").text()) - cantidad * precio * (tasaIva / 100);
     $(".iva").text(iva);
     total = subTotal + iva;
     $(".total").text(total);
@@ -472,7 +472,7 @@ function myFunction(myInput, myTable) {
 
 function totalGenral() {
   var retencion = $("#retencion").val() == "" ? 0 : $("#retencion").val();
-  var total = parseInt($(".total").text()) - parseInt(retencion);
+  var total = parseFloat($(".total").text()) - parseFloat(retencion);
   $(".totalGeneral").text(total);
   //console.log(total);
 }
