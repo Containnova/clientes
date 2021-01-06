@@ -67,6 +67,10 @@ body {
     background: #996699;
     font-family: 'Open Sans', sans-serif;
 }
+		
+.texto-color {
+  color: #996699;
+}
 
 table.table {
     table-layout: fixed;
@@ -456,9 +460,10 @@ function sumaTotal() {
 	<div class="card text-center mt-3">
 		<img src="https://containnova.github.io/clientes/regisan/img/logo-regisan.png" style="max-height: 15vh;">
 		<div class="card-header">
+			<u class="texto-color"><b> COBROS CLIENTES </b></u>
 			<div class="row mt-3">
 				<div class="col">
-					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha">
+					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha" autocomplete="off">
         </div>
 					<div class="form-group col">
 						<select class="inputFormat" id="inputPago">
@@ -467,27 +472,28 @@ function sumaTotal() {
               <option>Cheque</option>
               <option>Depósito</option>
               <option>Transferencia</option>
-              <option>Retenciones</option>
+              <option>Retención ISLR</option>
+              <option>Retención IVA</option>
             </select>
 					</div>
 					<div class="col">
-						<input type="text" id="inputNroDep" class="inputFormat" placeholder="No. Dp/Ch/Tr">
+						<input type="text" id="inputNroDep" class="inputFormat" placeholder="No. Dp/Ch/Tr" autocomplete="off">
         </div>
-						</div>
+					</div>
 
-						<div class="row">
-							<div class="col-12">
-								<input type="text" id="inputClientes" class="inputFormat" onkeyup="myFunction('inputClientes','myTable1')" placeholder="Clientes" autocomplete="off">
-								<table id="myTable1" class="tableList">
-									<tbody>
-										<tr class="header" id="clientes">
-											<th>Seleccionar</th>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<div class="col-12">
-								<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipo $">
+					<div class="row">
+						<div class="col-12">
+							<input type="text" id="inputClientes" class="inputFormat" onkeyup="myFunction('inputClientes','myTable1')" placeholder="Clientes" autocomplete="off">
+							<table id="myTable1" class="tableList">
+								<tbody>
+									<tr class="header" id="clientes">
+										<th>Seleccionar</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="col-12">
+							<input type="text" id="inputAnticipo" class="inputFormat" placeholder="Anticipo $" autocomplete="off">
         						</div>
 						</div>
 						<!-- nueva tabla -->
