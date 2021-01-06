@@ -68,6 +68,10 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
+.texto-color {
+  color: #996699;
+}
+		
 table.table {
     table-layout: fixed;
 }
@@ -405,7 +409,33 @@ Office.onReady(function(info) {
           proveedor,
           '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
           nro_fact,
-          "Retenciones - Modulo: Egresos",
+          "Retención ISLR - Modulo: Egresos",
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          retenciones,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          "Fac: " + nro_fact
+        ]);
+      };
+
+      if ($("#retencionIVA").val() != "" && $("#retencionIVA").val() != 0) {
+        var retenciones = $("#retencionIVA").val();
+        query.push([
+          "Pago",
+          "",
+          proveedor,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+          nro_fact,
+          "Retención IVA - Modulo: Egresos",
           "",
           "",
           0,
@@ -471,13 +501,22 @@ function myFunction(myInput, myTable) {
 }
 
 function totalGenral() {
+
   var retencion = $("#retencion").val() == "" ? 0 : $("#retencion").val();
-  var total = parseFloat($(".total").text()) - parseFloat(retencion);
+  var retencionIVA = $("#retencionIVA").val() == "" ? 0 : $("#retencionIVA").val();
+
+  var total = parseFloat($(".total").text()) - parseFloat(retencion) - parseFloat(retencionIVA);
+
   $(".totalGeneral").text(total);
   //console.log(total);
 }
 
 $(document).on("focusout", "#retencion", function() {
+  //console.log("aqui");
+  totalGenral();
+});
+
+$(document).on("focusout", "#retencionIVA", function () {
   //console.log("aqui");
   totalGenral();
 });
@@ -494,13 +533,14 @@ $(document).on("focusout", "#retencion", function() {
 	<div class="card text-center mt-3">
 		<img src="https://containnova.github.io/clientes/regisan/img/logo-regisan.png" style="max-height: 15vh;">
 		<div class="card-header">
+			<u class="texto-color"><b> EGRESOS POR COMPRAS </b></u>
 			<div class="row mt-3">
 
 				<div class="col">
-					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha">
+					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha" autocomplete="off">
 				</div>
 					<div class="col">
-						<input type="text" id="inputFactura" class="inputFormat" placeholder="No. Factura">
+						<input type="text" id="inputFactura" class="inputFormat" placeholder="No. Factura" autocomplete="off">
 								</div>
 					</div>
 					<div class="row">
@@ -620,11 +660,17 @@ $(document).on("focusout", "#retencion", function() {
 									</div>
 									<div class="col-6">
 										<b>
-											<div>Retenciones</div>
+											<div>Retención ISLR</div>
 											<input type="number" id="retencion" class="inputFormat totales retencion" placeholder="Monto Retenido" autocomplete="off">
 											</b>
 									</div>
 									<div class="col-6">
+										<b>
+											<div>Retención IVA</div>
+											<input type="number" id="retencionIVA" class="inputFormat totales retencion" placeholder="Monto Retenido" autocomplete="off">
+										</b>
+									</div>
+									<div class="col-12">
 										<b>
 											<div>Total General</div>
 											<div class="inputFormat totales totalGeneral">0</div>
@@ -646,6 +692,5 @@ $(document).on("focusout", "#retencion", function() {
 							</div>
 						</div>
 					</div>
-
 </body>
 </html>
