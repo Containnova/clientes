@@ -397,7 +397,7 @@ Office.onReady(function(info) {
       }
 
       //retenciones
-      if ($("#retencion").val() != "" && $("#retencion").val() != 0 ) {
+      if ($("#retencion").val() != "" && $("#retencion").val() != 0) {
         var retenciones = $("#retencion").val();
         query.push([
           "Cobro",
@@ -405,7 +405,7 @@ Office.onReady(function(info) {
           proveedor,
           '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
           nro_fact,
-          "Retenciones - Modulo: Ingresos",
+          "Retención ISLR - Modulo: Ingresos",
           "",
           "",
           0,
@@ -421,7 +421,33 @@ Office.onReady(function(info) {
           "=ROW()-1",
           "Fac: " + nro_fact
         ]);
-      };
+      }
+
+      if ($("#retencionIVA").val() != "" && $("#retencionIVA").val() != 0) {
+        var retenciones = $("#retencionIVA").val();
+        query.push([
+          "Cobro",
+          cliente,
+          proveedor,
+          '=DATE(YEAR("' + fecha + '"), MONTH("' + fecha + '"), DAY("' + fecha + '"))',
+          nro_fact,
+          "Retención IVA - Modulo: Ingresos",
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          retenciones * -1,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          "Fac: " + nro_fact
+        ]);
+      }
 
       //console.log(query);
 
@@ -471,16 +497,26 @@ function myFunction(myInput, myTable) {
 }
 
 function totalGenral() {
+  
   var retencion = $("#retencion").val() == "" ? 0 : $("#retencion").val();
-  var total = parseFloat($(".total").text()) - parseFloat(retencion);
+  var retencionIVA = $("#retencionIVA").val() == "" ? 0 : $("#retencionIVA").val();
+
+
+  var total = parseFloat($(".total").text()) - parseFloat(retencion) - parseFloat(retencionIVA);
   $(".totalGeneral").text(total);
   //console.log(total);
-};
+}
 
 $(document).on("focusout", "#retencion", function() {
   //console.log("aqui");
   totalGenral();
 });
+
+$(document).on("focusout", "#retencionIVA", function () {
+  //console.log("aqui");
+  totalGenral();
+});
+
 	
 </script>
 
@@ -488,16 +524,18 @@ $(document).on("focusout", "#retencion", function() {
 </head>
 
 <body>
+
 	<div class="container">
 	<div class="card text-center mt-3">
 		<img src="https://containnova.github.io/clientes/regisan/img/logo-regisan.png" style="max-height: 15vh;">
 		<div class="card-header">
+			<u class="texto-color"><b> INGRESOS POR VENTAS </b></u>
 			<div class="row mt-3">
 				<div class="col">
-					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha">
+					<input type="text" id="datepicker" class="inputFormat" placeholder="Fecha" autocomplete="off">
 				</div>
 					<div class="col">
-						<input type="text" id="inputFactura" class="inputFormat" placeholder="No. Factura">
+						<input type="text" id="inputFactura" class="inputFormat" placeholder="No. Factura" autocomplete="off">
 								</div>
 					</div>
 					<div class="row">
@@ -604,11 +642,17 @@ $(document).on("focusout", "#retencion", function() {
 									</div>
 									<div class="col-6">
 										<b>
-										<div>Retenciones</div>
+										<div>Retención ISLR</div>
 										<input type="number" id="retencion" class="inputFormat totales retencion" placeholder="Monto Retenido" autocomplete="off">
 										</b>
 									</div>
 									<div class="col-6">
+										<b>
+											<div>Retención IVA</div>
+											<input type="number" id="retencionIVA" class="inputFormat totales retencion" placeholder="Monto Retenido" autocomplete="off">
+										</b>
+									</div>
+									<div class="col-12">
 										<b>
 											<div>Total General</div>
 											<div class="inputFormat totales totalGeneral">0</div>
