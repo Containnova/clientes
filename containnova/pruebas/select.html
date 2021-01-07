@@ -59,7 +59,12 @@ li.list-group-item-action.disabled {
 		
 <script type="text/javascript">
 
-$(document).ready(function() {
+//$(document).ready(function() {
+
+//});
+
+Office.initialize = function() {
+
     //Lista
 $(".ci-buscar").focusin(function() {
   var id = $(this).attr("id");
@@ -104,11 +109,6 @@ $(document).on("click", ".ci-li-buscar", function() {
   $("ul#" + id).hide();
 });
 
-});
-
-Office.initialize = function() {
-
-<!-- AQUI JAVASCRIPT -->
 
 };
 </script>
