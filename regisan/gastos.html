@@ -151,88 +151,113 @@ table.table .form-control.error {
 		
 <script type="text/javascript">
 	
-Office.initialize = function() {
+Office.onReady(function (info) {
 
-$("#guardar").click(() => tryCatch(guardar));
-$("#limpiar").click(() => tryCatch(limpiar));
+  $("#guardar").click(() => tryCatch(guardar));
+  $("#limpiar").click(() => tryCatch(limpiar));
 
-async function guardar() {
-  await Excel.run(async (context) => {
-    var hojaGF = context.workbook.worksheets.getItem("Gastos Fijos");
-    var tbl_gastos_fijos = hojaGF.getRange("tbl_gastos_fijos").load();
+  async function guardar() {
+    await Excel.run(async (context) => {
+      var hojaGF = context.workbook.worksheets.getItem("Gastos Fijos");
+      var tbl_gastos_fijos = hojaGF.getRange("tbl_gastos_fijos").load();
 
-    var hoja = context.workbook.worksheets.getItem("BDD");
-    var expensesTable = hoja.tables.getItem("BDD");
+      var hoja = context.workbook.worksheets.getItem("BDD");
+      var expensesTable = hoja.tables.getItem("BDD");
 
-    var cuenta = "Egresos";
-    var datos, query, i;
+      var cuenta = "Egresos";
+      var datos, query, i;
 
 
-    await context.sync();
-    
-    datos = tbl_gastos_fijos;
-    
-    query = [];
+      await context.sync();
 
-    for (i = 0; i < datos.values.length; i++  ) {
-      query.push([
-        cuenta,
-        datos.values[i][4],
-        datos.values[i][1],
-        datos.values[i][0],
-        datos.values[i][2],
-        "Gastos Fijos: " + datos.values[i][3],
-        "",
-        "",
-        0,
-        0,
-        0,
-        0,
-        0,
-        datos.values[i][5]*-1,
-        "=YEAR([@fecha])",
-        '=UPPER(TEXT([@fecha],"mmmm"))',
-        '=IF([@proveedor]<>"","Proveedor","Cliente")',
-        '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
-        "=ROW()-1",
-        datos.values[i][2]
-      ]); 
-    };
+      datos = tbl_gastos_fijos;
 
-    //console.log(query);
+      query = [];
+      //Gastos fijos
+      for (i = 0; i < datos.values.length; i++) {
+        query.push([
+          cuenta,
+          datos.values[i][4],
+          datos.values[i][1],
+          datos.values[i][0],
+          datos.values[i][2],
+          "Gastos Fijos: " + datos.values[i][3],
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          datos.values[i][5] * -1,
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          datos.values[i][2]
+        ]);
+      };
+      //pagos gastos fijos
+      for (i = 0; i < datos.values.length; i++) {
+        query.push([
+          "Pago",
+          "",
+          datos.values[i][1],
+          datos.values[i][0],
+          datos.values[i][2],
+          "Pagos: Gastos Fijos: " + datos.values[i][3],
+          "",
+          "",
+          0,
+          0,
+          0,
+          0,
+          0,
+          datos.values[i][5],
+          "=YEAR([@fecha])",
+          '=UPPER(TEXT([@fecha],"mmmm"))',
+          '=IF([@proveedor]<>"","Proveedor","Cliente")',
+          '=IF(OR([@cuenta]="ingresos",[@cuenta]="egresos"),"resultados","balance")',
+          "=ROW()-1",
+          datos.values[i][2]
+        ]);
+      }
+      //console.log(query);
 
-    expensesTable.rows.add(null, query);
+      expensesTable.rows.add(null, query);
 
-      });
-    }
-
-async function limpiar() {
-  await Excel.run(async (context) => {
-    var hojaGF = context.workbook.worksheets.getItem("Gastos Fijos");
-    var tbl_gastos_fijos = hojaGF.tables.getItem("tbl_gastos");
-
-    var datos = tbl_gastos_fijos.load('rows, rows/count');
-
-    await context.sync();
-    // Elimina todas las filas de la tabla conservando las listas desplegables
-    for (let i = datos.rows.items.length - 1; i >= 0; i--) {
-      let tableRow = datos.rows.items[i]
-      tableRow.getRange().delete(Excel.DeleteShiftDirection.up)
-    }
-  });
-}
-
-function tryCatch(callback) {
-  Promise.resolve()
-    .then(callback)
-    .catch(function(error) {
-      // Nota: En caso de producción se recomienda notificar del error por otro medio.
-      console.error(error);
     });
-}
+  }
+
+  async function limpiar() {
+    await Excel.run(async (context) => {
+      var hojaGF = context.workbook.worksheets.getItem("Gastos Fijos");
+      var tbl_gastos_fijos = hojaGF.tables.getItem("tbl_gastos");
+
+      var datos = tbl_gastos_fijos.load('rows, rows/count');
+
+      await context.sync();
+      // Elimina todas las filas de la tabla conservando las listas desplegables
+      for (let i = datos.rows.items.length - 1; i >= 0; i--) {
+        let tableRow = datos.rows.items[i]
+        tableRow.getRange().delete(Excel.DeleteShiftDirection.up)
+      }
+    });
+  }
+
+  function tryCatch(callback) {
+    Promise.resolve()
+      .then(callback)
+      .catch(function (error) {
+        // Nota: En caso de producción se recomienda notificar del error por otro medio.
+        console.error(error);
+      });
+  }
 
 
-};
+})
+	
 </script>
 
 
