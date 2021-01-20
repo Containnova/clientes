@@ -30,10 +30,15 @@
 	
 	<!-- ESTILOS -->	
 	<style>
-		  * {
+* {
   font-size: 14px;
 }
 
+.oculto {
+ visibility: hidden; 
+ display:none;
+}
+		
 .inputFormat {
   width: 100%;
   background-position: 10px 10px;
@@ -234,10 +239,12 @@ Office.onReady(function(info) {
 
   /* nueva tabla */
   $(".add-new").click(function() {
-    var index = $("#newTable tbody tr:last-child").index();
+    //var index = $("#newTable tbody tr:last-child").index();
 
-    var subServ, precio, cantidad, subTotal, tasaIva, iva, total;
+    var serv, producto, subServ, precio, cantidad, subTotal, tasaIva, iva, total;
 
+    serv = $("#inputServicios").val();
+    producto = $("#inputProductos").val();
     subServ = $("#inpuntSubServicios").val();
     cantidad = $("#cantidad").val();
     precio = $("#precio").val();
@@ -254,6 +261,8 @@ Office.onReady(function(info) {
     totalGenral();
 
     var row = `<tr>
+    <td class="serv oculto">${serv}</td>
+    <td class="producto oculto">${producto}</td>
     <td class="subServ">${subServ}</td>
     <td class="cantidad">${cantidad}</td>
     <td class="precio">${precio}</td>
@@ -349,9 +358,9 @@ Office.onReady(function(info) {
       var proveedor = "";
       var fecha = $("#datepicker").val();
       var nro_fact = $("#inputFactura").val();
-      var servicio_descripcion = $("#inputServicios").val();
-      var producto = $("#inputProductos").val();
-      var subServ, cantidad, precio_u, tasa, datos, query;
+      //var servicio_descripcion = $("#inputServicios").val();
+      //var producto = $("#inputProductos").val();
+      var servicio_descripcion, producto, subServ, cantidad, precio_u, tasa, datos, query;
 
       //var index = $("#newTable tbody tr:last-child").index(); ${}
       datos = $("#newTable").find("tr:has(td)");
@@ -359,6 +368,14 @@ Office.onReady(function(info) {
       //console.log(datos.length - 1);
 
       for (var i = 0; i < datos.length; i++) {
+        servicio_descripcion = datos
+          .eq(i)
+          .find($(".serv"))
+          .text();
+        producto = datos
+          .eq(i)
+          .find($(".producto"))
+          .text();
         subServ = datos
           .eq(i)
           .find($(".subServ"))
@@ -501,10 +518,8 @@ function myFunction(myInput, myTable) {
 }
 
 function totalGenral() {
-  
   var retencion = $("#retencion").val() == "" ? 0 : $("#retencion").val();
   var retencionIVA = $("#retencionIVA").val() == "" ? 0 : $("#retencionIVA").val();
-
 
   var total = parseFloat($(".total").text()) - parseFloat(retencion) - parseFloat(retencionIVA);
   $(".totalGeneral").text(total);
@@ -516,7 +531,7 @@ $(document).on("focusout", "#retencion", function() {
   totalGenral();
 });
 
-$(document).on("focusout", "#retencionIVA", function () {
+$(document).on("focusout", "#retencionIVA", function() {
   //console.log("aqui");
   totalGenral();
 });
@@ -529,7 +544,7 @@ $(document).on("focusout", "#retencionIVA", function () {
 
 <body>
 
-	<div class="container">
+<div class="container">
 	<div class="card text-center mt-3">
 		<img src="https://containnova.github.io/clientes/regisan/img/logo-regisan.png" style="max-height: 15vh;">
 		<div class="card-header">
@@ -612,6 +627,8 @@ $(document).on("focusout", "#retencionIVA", function () {
 										<table class="table table-bordered" id="newTable">
 											<thead class="cabecera">
 												<tr>
+													<th class="oculto">Servicio</th>
+													<th class="oculto">producto</th>
 													<th>Sub Servicio</th>
 													<th>Cantidad</th>
 													<th>Precio</th>
@@ -678,6 +695,5 @@ $(document).on("focusout", "#retencionIVA", function () {
 							</div>
 						</div>
 					</div>
-
 </body>
 </html>
