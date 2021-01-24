@@ -194,7 +194,7 @@ Office.onReady(function (info) {
 
     await context.sync(); //resultados
 
-    rango = "A4:C" + ultFila.rowCount;
+    rango = "A4:C" + (ultFila.rowCount + 2);
 
     cargarlista(clientes, "clientes");
     //console.log(hojaEstados);
