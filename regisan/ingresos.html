@@ -254,9 +254,9 @@ Office.onReady(function(info) {
     subTotal = subTotal + cantidad * precio;
     $(".subTotal").text(subTotal);
     iva = parseFloat($(".iva").text()) + cantidad * precio * (tasaIva / 100);
-    $(".iva").text(iva);
+    $(".iva").text(iva.toFixed(2));
     total = subTotal + iva;
-    $(".total").text(total);
+    $(".total").text(total.toFixed(2));
 
     totalGenral();
 
@@ -334,11 +334,11 @@ Office.onReady(function(info) {
 
     subTotal = parseFloat($(".subTotal").text());
     subTotal = subTotal - cantidad * precio;
-    $(".subTotal").text(subTotal);
+    $(".subTotal").text(subTotal.toFixed(2));
     iva = parseFloat($(".iva").text()) - cantidad * precio * (tasaIva / 100);
-    $(".iva").text(iva);
+    $(".iva").text(iva.toFixed(2));
     total = subTotal + iva;
-    $(".total").text(total);
+    $(".total").text(total.toFixed(2));
 
     totalGenral();
 
@@ -406,7 +406,7 @@ Office.onReady(function(info) {
           precio_u,
           tasa,
           "=[@cantidad]*[@[precio_u]]",
-          "=[@[base_imp]]*[@tasa]%",
+          "=ROUNDUP([@[base_imp]]*[@tasa]%,2)",
           "=[@[base_imp]]+[@iva]",
           "=YEAR([@fecha])",
           '=UPPER(TEXT([@fecha],"mmmm"))',
